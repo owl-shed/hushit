@@ -24,4 +24,9 @@
 		<ProjectReference Include="../../engine/Engine/Engine.csproj" />
 	</ItemGroup>
 
+	<!-- Package references -->
+	<ItemGroup Label="packages">
+		<PackageReference Include="Mediator.Abstractions" Version="3.0.2" />
+	</ItemGroup>
+
 </Project>
