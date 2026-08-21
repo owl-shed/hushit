@@ -105,3 +105,73 @@ jobs:
       - name: Run the tests.
         working-directory: src/
         run: dotnet test --no-build --configuration ${{ matrix.configuration }} --warnaserror /p:noWarn=IDE0055 /p:noWarn=CS1591
+
+
+  publish:
+    # Only on main and dev
+    if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            target-runtime: linux-x64
+
+          - runner: ubuntu-24.04-arm
+            target-runtime: linux-arm64
+
+          #- runner: windows-latest
+            #target-runtime: win-x64
+
+          #- runner: windows-11-arm
+            #target-runtime: win-arm64
+
+          #- runner: macos-latest
+            #target-runtime: osx-arm64
+
+          #- runner: macos-26-intel
+            #target-runtime: osx-x64
+
+    runs-on: ${{ matrix.runner }}
+
+    steps:
+      - name: Checkout the repository.
+        uses: actions/checkout@v5
+        with:
+          sparse-checkout: |
+            src/
+            .editorconfig
+
+      - name: Setup the .NET development environment.
+        uses: actions/setup-dotnet@v5
+
+      - name: Restore the project dependencies.
+        working-directory: src/clients/Monolith/
+        run: dotnet restore --runtime ${{ matrix.target-runtime }}
+
+      - name: Build the project directory.
+        working-directory: src/clients/Monolith/
+        run: dotnet build --no-restore --warnaserror --configuration Release --runtime ${{ matrix.target-runtime }} /p:ContinuousIntegrationBuild=true /p:noWarn=IDE0055 /p:noWarn=CS1591
+
+      - name: Publish the project.
+        working-directory: src/clients/Monolith/
+        run: dotnet publish --no-build --configuration Release --runtime ${{ matrix.target-runtime }} /p:ContinuousIntegrationBuild=true /p:noWarn=IDE0055 /p:noWarn=CS1591 --output "${{ runner.temp }}/publishing/Monolith/hushit (${{ matrix.target-runtime }})"
+
+      - name: Remove unnecessary files.
+        working-directory: "${{ runner.temp }}/publishing/Monolith/hushit (${{ matrix.target-runtime }})"
+        run: rm -f *.xml
+
+      - name: Create the archive directory.
+        run: mkdir "${{ runner.temp }}/publishing/archives"
+
+      - name: Archive the published artifact.
+        working-directory: "${{ runner.temp }}/publishing/Monolith"
+        run: tar -cvzf "../archives/Monolith/hushit (${{ matrix.target-runtime }}).tar.gz" "hushit (${{ matrix.target-runtime }})"
+
+      - name: Upload published artifact.
+        uses: actions/upload-artifact@v7
+        with:
+          path: "${{ runner.temp }}/publishing/archives/Monolith/hushit (${{ matrix.target-runtime }}).tar.gz"
+          name: "hushit (${{ matrix.target-runtime }})"
+          if-no-files-found: error
+          archive: false
