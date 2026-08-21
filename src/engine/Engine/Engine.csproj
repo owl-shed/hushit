@@ -19,4 +19,10 @@
 		<IsTrimmable Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net6.0'))">false</IsTrimmable>
 	</PropertyGroup>
 
+	<!-- Project references -->
+	<ItemGroup Label="projects">
+		<ProjectReference Include="../../data/Data/Data.csproj" />
+		<ProjectReference Include="../../audio/Audio/Audio.csproj" />
+	</ItemGroup>
+
 </Project>
