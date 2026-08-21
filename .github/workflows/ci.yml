@@ -162,7 +162,7 @@ jobs:
         run: rm -f *.xml
 
       - name: Create the archive directory.
-        run: mkdir "${{ runner.temp }}/publishing/archives"
+        run: mkdir -p "${{ runner.temp }}/publishing/archives/Monolith"
 
       - name: Archive the published artifact.
         working-directory: "${{ runner.temp }}/publishing/Monolith"
