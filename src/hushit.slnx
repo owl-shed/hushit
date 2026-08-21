@@ -1,4 +1,7 @@
 <Solution>
+	<Folder Name="/audio/">
+		<Project Path="audio/Audio/Audio.csproj" />
+	</Folder>
 	<Folder Name="/clients/">
 		<Project Path="clients/Monolith/Monolith.csproj" />
 	</Folder>
