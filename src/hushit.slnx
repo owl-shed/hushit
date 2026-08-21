@@ -14,4 +14,7 @@
 	<Folder Name="/engine/">
 		<Project Path="engine/Engine/Engine.csproj" />
 	</Folder>
+	<Folder Name="/interaction/">
+		<Project Path="interaction/Interaction/Interaction.csproj" />
+	</Folder>
 </Solution>
