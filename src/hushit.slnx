@@ -2,4 +2,7 @@
 	<Folder Name="/clients/">
 		<Project Path="clients/Monolith/Monolith.csproj" />
 	</Folder>
+	<Folder Name="/common/">
+		<Project Path="common/Common/Common.csproj" />
+	</Folder>
 </Solution>
