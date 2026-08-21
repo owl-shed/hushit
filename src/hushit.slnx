@@ -5,4 +5,7 @@
 	<Folder Name="/common/">
 		<Project Path="common/Common/Common.csproj" />
 	</Folder>
+	<Folder Name="/data/">
+		<Project Path="data/Data/Data.csproj" />
+	</Folder>
 </Solution>
