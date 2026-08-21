@@ -1,1 +1,5 @@
-<Solution />
+<Solution>
+	<Folder Name="/clients/">
+		<Project Path="clients/Monolith/Monolith.csproj" />
+	</Folder>
+</Solution>
