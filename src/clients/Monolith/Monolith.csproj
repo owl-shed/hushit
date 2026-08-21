@@ -10,7 +10,8 @@
 		<AssemblyName>hushit</AssemblyName>
 		<RootNamespace>OwlShed.Hushit.Monolith</RootNamespace>
 
-		<GenerateDocumentationFile>false</GenerateDocumentationFile>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<NoWarn>CS1591</NoWarn>
 		<Deterministic>true</Deterministic>
 
 		<EnableNETAnalyzers>true</EnableNETAnalyzers>
