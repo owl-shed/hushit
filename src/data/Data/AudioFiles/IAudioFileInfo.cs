@@ -1,0 +1,34 @@
+namespace OwlShed.Hushit.Data.AudioFiles;
+
+/// <summary>
+/// 	Represents information about an audio file.
+/// </summary>
+public interface IAudioFileInfo : IDataModel<IAudioFileUpdate>
+{
+	#region Properties
+	/// <summary>The local path to the audio file.</summary>
+	string Path { get; }
+
+	/// <summary>The hash of the audio file the last time it was loaded.</summary>
+	HashInfo Hash { get; }
+
+	/// <summary>The name of the audio track.</summary>
+	/// <remarks>If the value couldn't be loaded from the metadata, then the name of the audio file will be used.</remarks>
+	string Track { get; }
+
+	/// <summary>The date that the track was released on.</summary>
+	DateInfo? TrackDate { get; }
+
+	/// <summary>The name of the album that the audio track belongs to.</summary>
+	string? Album { get; }
+
+	/// <summary>The date that the album was released on.</summary>
+	DateInfo? AlbumDate { get; }
+
+	/// <summary>The names of the artists that made the track.</summary>
+	IReadOnlyList<string> TrackArtists { get; }
+
+	/// <summary>The names of the artists that made the album.</summary>
+	IReadOnlyList<string> AlbumArtists { get; }
+	#endregion
+}
