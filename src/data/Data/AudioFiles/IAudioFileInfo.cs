@@ -37,4 +37,20 @@ public interface IAudioFileInfo : IDataModel<IAudioFileUpdate>
 	/// <summary>The names of the genres that the album belongs to.</summary>
 	IReadOnlyList<string> AlbumGenres { get; }
 	#endregion
+
+	#region Methods
+	/// <summary>Tries to reload the metadata for file, if the file hash changed.</summary>
+	/// <param name="cancellation">A cancellation token that can be used to cancel the operation.</param>
+	/// <returns><see langword="true"/> if any metadata changed, <see langword="false"/> otherwise.</returns>
+	/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
+	/// <exception cref="ArgumentException">Thrown if the audio file no longer existed in the repository.</exception>
+	ValueTask<bool> TryReloadAsync(CancellationToken cancellation = default);
+
+	/// <summary>Force reloads the metadata for the file, regardless of the hash check.</summary>
+	/// <param name="cancellation">A cancellation token that can be used to cancel the operation.</param>
+	/// <returns><see langword="true"/> if any metadata changed, <see langword="false"/> otherwise.</returns>
+	/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
+	/// <exception cref="ArgumentException">Thrown if the given audio file no longer existed in the repository.</exception>
+	ValueTask<bool> ReloadAsync(CancellationToken cancellation = default);
+	#endregion
 }
