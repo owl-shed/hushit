@@ -48,7 +48,7 @@ public interface IDataRepository<TModel> : IDataRepository
 	{
 		cancellation.ThrowIfCancellationRequested();
 
-		await foreach (TModel typed in GetAllAsync(cancellation))
+		await foreach (TModel typed in GetAllAsync(cancellation).WithCancellation(cancellation).ConfigureAwait(false))
 			yield return typed;
 	}
 
@@ -65,7 +65,7 @@ public interface IDataRepository<TModel> : IDataRepository
 	{
 		cancellation.ThrowIfCancellationRequested();
 
-		TModel? model = await TryGetAsync(id, cancellation);
+		TModel? model = await TryGetAsync(id, cancellation).ConfigureAwait(false);
 		return model;
 	}
 	#endregion
@@ -118,7 +118,7 @@ public static class IDataRepositoryExtensions
 		{
 			cancellation.ThrowIfCancellationRequested();
 
-			IDataModel? model = await repository.TryGetAsync(id, cancellation);
+			IDataModel? model = await repository.TryGetAsync(id, cancellation).ConfigureAwait(false);
 			if (model is null)
 				ThrowHelper.ThrowArgumentException(nameof(id), $"No data model with the given id ({id}) existed in the repository.");
 
@@ -141,7 +141,7 @@ public static class IDataRepositoryExtensions
 		{
 			cancellation.ThrowIfCancellationRequested();
 
-			TModel? model = await repository.TryGetAsync(id, cancellation);
+			TModel? model = await repository.TryGetAsync(id, cancellation).ConfigureAwait(false);
 			if (model is null)
 				ThrowHelper.ThrowArgumentException(nameof(id), $"No data model with the given id ({id}) existed in the repository.");
 
@@ -157,7 +157,7 @@ public static class IDataRepositoryExtensions
 		{
 			cancellation.ThrowIfCancellationRequested();
 
-			return await repository.RemoveAsync(model.Id, cancellation);
+			return await repository.RemoveAsync(model.Id, cancellation).ConfigureAwait(false);
 		}
 		#endregion
 	}
@@ -178,11 +178,11 @@ public static class IDataRepositoryExtensions
 		{
 			cancellation.ThrowIfCancellationRequested();
 
-			TModel? model = await repository.TryGetAsync(id, cancellation);
+			TModel? model = await repository.TryGetAsync(id, cancellation).ConfigureAwait(false);
 			if (model is null)
 				ThrowHelper.ThrowArgumentException(nameof(id), $"No data model with the given id ({id}) existed in the repository.");
 
-			return await repository.UpdateAsync(model, callback, cancellation);
+			return await repository.UpdateAsync(model, callback, cancellation).ConfigureAwait(false);
 		}
 		#endregion
 	}

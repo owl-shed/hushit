@@ -53,11 +53,11 @@ public static class IAudioFileRepositoryExtensions
 		{
 			cancellation.ThrowIfCancellationRequested();
 
-			IAudioFileInfo? file = await repository.TryGetAsync(id, cancellation);
+			IAudioFileInfo? file = await repository.TryGetAsync(id, cancellation).ConfigureAwait(false);
 			if (file is null)
 				ThrowHelper.ThrowArgumentException(nameof(id), $"No data file with the id ({id}) existed in the repository.");
 
-			return await repository.TryReloadAsync(file, cancellation);
+			return await repository.TryReloadAsync(file, cancellation).ConfigureAwait(false);
 		}
 
 		/// <summary>Force reloads the metadata for the audio file with the given <paramref name="id"/>, regardless of the hash check.</summary>
@@ -70,11 +70,11 @@ public static class IAudioFileRepositoryExtensions
 		{
 			cancellation.ThrowIfCancellationRequested();
 
-			IAudioFileInfo? file = await repository.TryGetAsync(id, cancellation);
+			IAudioFileInfo? file = await repository.TryGetAsync(id, cancellation).ConfigureAwait(false);
 			if (file is null)
 				ThrowHelper.ThrowArgumentException(nameof(id), $"No data file with the id ({id}) existed in the repository.");
 
-			return await repository.ReloadAsync(file, cancellation);
+			return await repository.ReloadAsync(file, cancellation).ConfigureAwait(false);
 		}
 		#endregion
 	}
