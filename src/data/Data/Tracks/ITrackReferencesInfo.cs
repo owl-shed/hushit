@@ -9,4 +9,12 @@ public interface ITrackReferencesInfo : IDataModel
 	/// <summary>The ids of the related tracks.</summary>
 	ReadOnlyObservableCollection<string> TrackIds { get; }
 	#endregion
+
+	#region Methods
+	/// <summary>Gets the related tracks.</summary>
+	/// <param name="cancellation">A cancellation token that can be used to cancel the operation.</param>
+	/// <returns>An asynchronous enumerable of the related tracks.</returns>
+	/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
+	IAsyncEnumerable<ITrackInfo> GetTracksAsync(CancellationToken cancellation = default);
+	#endregion
 }

@@ -55,5 +55,11 @@ public interface IAudioFileInfo : IDataModel<IAudioFileUpdate>
 	/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
 	/// <exception cref="ArgumentException">Thrown if the given audio file no longer existed in the repository.</exception>
 	ValueTask<bool> ReloadAsync(CancellationToken cancellation = default);
+
+	/// <summary>Gets the track that the audio file is linked to.</summary>
+	/// <param name="cancellation">A cancellation token that can be used to cancel the operation.</param>
+	/// <returns>The track that the audio file is linked to, or <see langword="null"/> if the track didn't belong to an audio file.</returns>
+	/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
+	ValueTask<ITrackInfo?> GetTrackAsync(CancellationToken cancellation = default);
 	#endregion
 }
