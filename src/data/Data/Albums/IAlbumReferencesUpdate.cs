@@ -45,3 +45,56 @@ public interface IAlbumReferencesUpdate<TBuilder> : IAlbumReferencesUpdate
 	IAlbumReferencesUpdate IAlbumReferencesUpdate.WithAlbums(params IReadOnlyList<string> albumIds) => WithAlbums(albumIds);
 	#endregion
 }
+
+/// <summary>
+/// 	Contains various extensions related to the <see cref="IAlbumReferencesUpdate"/>.
+/// </summary>
+public static class IAlbumReferencesUpdateExtensions
+{
+	extension(IAlbumReferencesUpdate update)
+	{
+		#region Methods
+		/// <summary>Adds a new related album.</summary>
+		/// <param name="album">The album to add.</param>
+		/// <returns>The used update builder.</returns>
+		public IAlbumReferencesUpdate AddAlbum(IAlbumInfo album) => update.AddAlbum(album.Id);
+
+		/// <summary>Removes a related album.</summary>
+		/// <param name="album">The album to remove.</param>
+		/// <returns>The used update builder.</returns>
+		public IAlbumReferencesUpdate RemoveAlbum(IAlbumInfo album) => update.RemoveAlbum(album.Id);
+
+		/// <summary>Sets the new album ids.</summary>
+		/// <param name="albums">The new related albums.</param>
+		/// <returns>The used update builder.</returns>
+		public IAlbumReferencesUpdate WithAlbums(params IReadOnlyList<IAlbumInfo> albums)
+		{
+			string[] ids = albums.Select(static album => album.Id).ToArray();
+			return update.WithAlbums(ids);
+		}
+		#endregion
+	}
+	extension<TBuilder>(IAlbumReferencesUpdate<TBuilder> update) where TBuilder : notnull, IAlbumReferencesUpdate<TBuilder>
+	{
+		#region Methods
+		/// <summary>Adds a new related album.</summary>
+		/// <param name="album">The album to add.</param>
+		/// <returns>The used update builder.</returns>
+		public TBuilder AddAlbum(IAlbumInfo album) => update.AddAlbum(album.Id);
+
+		/// <summary>Removes a related album.</summary>
+		/// <param name="album">The album to remove.</param>
+		/// <returns>The used update builder.</returns>
+		public TBuilder RemoveAlbum(IAlbumInfo album) => update.RemoveAlbum(album.Id);
+
+		/// <summary>Sets the new album ids.</summary>
+		/// <param name="albums">The new related albums.</param>
+		/// <returns>The used update builder.</returns>
+		public TBuilder WithAlbums(params IReadOnlyList<IAlbumInfo> albums)
+		{
+			string[] ids = albums.Select(static album => album.Id).ToArray();
+			return update.WithAlbums(ids);
+		}
+		#endregion
+	}
+}

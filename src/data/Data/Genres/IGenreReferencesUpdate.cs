@@ -45,3 +45,56 @@ public interface IGenreReferencesUpdate<TBuilder> : IGenreReferencesUpdate
 	IGenreReferencesUpdate IGenreReferencesUpdate.WithGenres(params IReadOnlyList<string> genreIds) => WithGenres(genreIds);
 	#endregion
 }
+
+/// <summary>
+/// 	Contains various extensions related to the <see cref="IGenreReferencesUpdate"/>.
+/// </summary>
+public static class IGenreReferencesUpdateExtensions
+{
+	extension(IGenreReferencesUpdate update)
+	{
+		#region Methods
+		/// <summary>Adds a new related genre.</summary>
+		/// <param name="genre">The genre to add.</param>
+		/// <returns>The used update builder.</returns>
+		public IGenreReferencesUpdate AddGenre(IGenreInfo genre) => update.AddGenre(genre.Id);
+
+		/// <summary>Removes a related genre.</summary>
+		/// <param name="genre">The genre to remove.</param>
+		/// <returns>The used update builder.</returns>
+		public IGenreReferencesUpdate RemoveGenre(IGenreInfo genre) => update.RemoveGenre(genre.Id);
+
+		/// <summary>Sets the new genre ids.</summary>
+		/// <param name="genres">The new related genres.</param>
+		/// <returns>The used update builder.</returns>
+		public IGenreReferencesUpdate WithGenres(params IReadOnlyList<IGenreInfo> genres)
+		{
+			string[] ids = genres.Select(static genre => genre.Id).ToArray();
+			return update.WithGenres(ids);
+		}
+		#endregion
+	}
+	extension<TBuilder>(IGenreReferencesUpdate<TBuilder> update) where TBuilder : notnull, IGenreReferencesUpdate<TBuilder>
+	{
+		#region Methods
+		/// <summary>Adds a new related genre.</summary>
+		/// <param name="genre">The genre to add.</param>
+		/// <returns>The used update builder.</returns>
+		public TBuilder AddGenre(IGenreInfo genre) => update.AddGenre(genre.Id);
+
+		/// <summary>Removes a related genre.</summary>
+		/// <param name="genre">The genre to remove.</param>
+		/// <returns>The used update builder.</returns>
+		public TBuilder RemoveGenre(IGenreInfo genre) => update.RemoveGenre(genre.Id);
+
+		/// <summary>Sets the new genre ids.</summary>
+		/// <param name="genres">The new related genres.</param>
+		/// <returns>The used update builder.</returns>
+		public TBuilder WithGenres(params IReadOnlyList<IGenreInfo> genres)
+		{
+			string[] ids = genres.Select(static genre => genre.Id).ToArray();
+			return update.WithGenres(ids);
+		}
+		#endregion
+	}
+}

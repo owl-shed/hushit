@@ -33,3 +33,24 @@ public interface ITrackUpdate : IArtistReferencesUpdate<ITrackUpdate>, IGenreRef
 	ITrackUpdate WithAudioFile(string? id);
 	#endregion
 }
+
+/// <summary>
+/// 	Contains various extensions related to the <see cref="ITrackUpdate"/>.
+/// </summary>
+public static class ITrackUpdateExtensions
+{
+	extension(ITrackUpdate track)
+	{
+		#region Methods
+		/// <summary>Sets the new album of the track.</summary>
+		/// <param name="album">The new album of the track. A <see langword="null"/> value can be used to remove track from the album.</param>
+		/// <returns>The used track update builder.</returns>
+		public ITrackUpdate WithAlbum(IAlbumInfo? album) => track.WithAlbum(album?.Id);
+
+		/// <summary>Sets the new audio file of the track.</summary>
+		/// <param name="file">The new audio file of the track. A <see langword="null"/> value can be used to remove track from the audio file.</param>
+		/// <returns>The used track update builder.</returns>
+		public ITrackUpdate WithAudioFile(IAudioFileInfo? file) => track.WithAudioFile(file?.Id);
+		#endregion
+	}
+}

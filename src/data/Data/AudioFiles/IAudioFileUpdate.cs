@@ -85,3 +85,19 @@ public interface IAudioFileUpdate
 	IAudioFileUpdate WithTrack(string? id);
 	#endregion
 }
+
+/// <summary>
+/// 	Contains various extensions related to the <see cref="IAudioFileUpdate"/>.
+/// </summary>
+public static class IAudioFileUpdateExtensions
+{
+	extension(IAudioFileUpdate update)
+	{
+		#region Methods
+		/// <summary>Sets the new track of the audio file.</summary>
+		/// <param name="track">The new track of the audio file. A <see langword="null"/> value can be used to remove audio file from the track.</param>
+		/// <returns>The used audio file update builder.</returns>
+		public IAudioFileUpdate WithTrack(ITrackInfo? track) => update.WithTrack(track?.Id);
+		#endregion
+	}
+}
