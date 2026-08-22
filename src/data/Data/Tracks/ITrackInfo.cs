@@ -3,7 +3,7 @@ namespace OwlShed.Hushit.Data.Tracks;
 /// <summary>
 /// 	Represents information about a track.
 /// </summary>
-public interface ITrackInfo : IDataModel<ITrackUpdate>
+public interface ITrackInfo : IDataModel<ITrackUpdate>, IArtistReferencesInfo, IGenreReferencesInfo
 {
 	#region Properties
 	/// <summary>The name of the track.</summary>
@@ -11,12 +11,6 @@ public interface ITrackInfo : IDataModel<ITrackUpdate>
 
 	/// <summary>The duration of the track.</summary>
 	TimeSpan Duration { get; }
-
-	/// <summary>The ids of the track artists.</summary>
-	ReadOnlyObservableCollection<string> ArtistIds { get; }
-
-	/// <summary>The ids of the track genres.</summary>
-	ReadOnlyObservableCollection<string> GenreIds { get; }
 
 	/// <summary>The id of the album that the track belongs to.</summary>
 	string? AlbumId { get; }
