@@ -59,5 +59,23 @@ public interface IAudioFileUpdate
 	/// 	or only consisted of white-space characters.
 	/// </exception>
 	IAudioFileUpdate WithAlbumArtists(params IReadOnlyList<string> artists);
+
+	/// <summary>Sets the new genres that the track belongs to.</summary>
+	/// <param name="genres">The genres that the track belongs to.</param>
+	/// <returns>The used audio file update builder.</returns>
+	/// <exception cref="ArgumentException">
+	/// 	Thrown if any of the genre names were empty
+	/// 	or only consisted of white-space characters.
+	/// </exception>
+	IAudioFileUpdate WithTrackGenres(params IReadOnlyList<string> genres);
+
+	/// <summary>Sets the new genres that the album belongs to.</summary>
+	/// <param name="genres">The genres that the album belongs to.</param>
+	/// <returns>The used audio file update builder.</returns>
+	/// <exception cref="ArgumentException">
+	/// 	Thrown if any of the genre names were empty
+	/// 	or only consisted of white-space characters.
+	/// </exception>
+	IAudioFileUpdate WithAlbumGenres(params IReadOnlyList<string> genres);
 	#endregion
 }

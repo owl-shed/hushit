@@ -30,5 +30,11 @@ public interface IAudioFileInfo : IDataModel<IAudioFileUpdate>
 
 	/// <summary>The names of the artists that made the album.</summary>
 	IReadOnlyList<string> AlbumArtists { get; }
+
+	/// <summary>The names of the genres that the track belongs to.</summary>
+	IReadOnlyList<string> TrackGenres { get; }
+
+	/// <summary>The names of the genres that the album belongs to.</summary>
+	IReadOnlyList<string> AlbumGenres { get; }
 	#endregion
 }
