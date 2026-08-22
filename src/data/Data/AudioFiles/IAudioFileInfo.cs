@@ -14,7 +14,7 @@ public interface IAudioFileInfo : IDataModel<IAudioFileUpdate>
 
 	/// <summary>The name of the audio track.</summary>
 	/// <remarks>If the value couldn't be loaded from the metadata, then the name of the audio file will be used.</remarks>
-	string Track { get; }
+	string TrackName { get; }
 
 	/// <summary>The date that the track was released on.</summary>
 	DateInfo? TrackDate { get; }
@@ -36,6 +36,9 @@ public interface IAudioFileInfo : IDataModel<IAudioFileUpdate>
 
 	/// <summary>The names of the genres that the album belongs to.</summary>
 	IReadOnlyList<string> AlbumGenres { get; }
+
+	/// <summary>The id of the track that the audio file is linked to.</summary>
+	string? TrackId { get; }
 	#endregion
 
 	#region Methods

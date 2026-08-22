@@ -21,7 +21,7 @@ public interface IAudioFileUpdate
 	/// <param name="name">The new name for the track.</param>
 	/// <returns>The used audio file update builder.</returns>
 	/// <exception cref="ArgumentException">Thrown if the given name was empty.</exception>
-	IAudioFileUpdate WithTrack(string name);
+	IAudioFileUpdate WithTrackName(string name);
 
 	/// <summary>Sets the new name for the album.</summary>
 	/// <param name="name">The new name for the album.</param>
@@ -77,5 +77,11 @@ public interface IAudioFileUpdate
 	/// 	or only consisted of white-space characters.
 	/// </exception>
 	IAudioFileUpdate WithAlbumGenres(params IReadOnlyList<string> genres);
+
+	/// <summary>Sets the id for the new track of the audio file.</summary>
+	/// <param name="id">The id for the new track of the audio file. A <see langword="null"/> value can be used to remove audio file from the track.</param>
+	/// <returns>The used audio file update builder.</returns>
+	/// <exception cref="ArgumentException">Thrown if the given <paramref name="id"/> was empty.</exception>
+	IAudioFileUpdate WithTrack(string? id);
 	#endregion
 }
