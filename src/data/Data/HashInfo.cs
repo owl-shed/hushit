@@ -3,6 +3,7 @@ namespace OwlShed.Hushit.Data;
 /// <summary>
 /// 	Represents information about a hash.
 /// </summary>
+[DebuggerDisplay($"{{{nameof(DebuggerDisplay)}(), nq}}")]
 public readonly struct HashInfo
 {
 	#region Properties
@@ -29,5 +30,9 @@ public readonly struct HashInfo
 		Kind = kind;
 		Value = value;
 	}
+	#endregion
+
+	#region Helpers
+	private string DebuggerDisplay() => $"{nameof(HashInfo)} {{ {nameof(Kind)} = ({Kind}), {nameof(Value)} = ({Value}) }}";
 	#endregion
 }

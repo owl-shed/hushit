@@ -3,6 +3,7 @@ namespace OwlShed.Hushit.Data;
 /// <summary>
 /// 	Represents potentially partial information about a date.
 /// </summary>
+[DebuggerDisplay($"{{{nameof(DebuggerDisplay)}(), nq}}")]
 public readonly struct DateInfo
 {
 	#region Properties
@@ -26,6 +27,24 @@ public readonly struct DateInfo
 		Year = year;
 		Month = month;
 		Day = day;
+	}
+	#endregion
+
+	#region Helpers
+	private string DebuggerDisplay()
+	{
+		List<string> parts = [];
+
+		if (Year is not null)
+			parts.Add($"{Year} = ({Year})");
+
+		if (Month is not null)
+			parts.Add($"{Month} = ({Month})");
+
+		if (Day is not null)
+			parts.Add($"{Day} = ({Day})");
+
+		return $"{nameof(DateInfo)} {{ {string.Join(", ", parts)} }}";
 	}
 	#endregion
 }
