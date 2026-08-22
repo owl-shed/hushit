@@ -13,13 +13,6 @@ public interface IAudioPlayer : INotifyPropertyChanged, IDisposable
 	/// <exception cref="ArgumentOutOfRangeException">Thrown if the given value is not between <c>0</c> and <c>1</c>.</exception>
 	double Volume { get; set; }
 
-	/// <summary>Whether the audio playback is currently muted.</summary>
-	/// <remarks>
-	/// 	This should be treated as an override to the <see cref="Volume"/>, and it
-	/// 	should not influence, or be influence by the <see cref="Volume"/> value.
-	/// </remarks>
-	bool IsMute { get; set; }
-
 	/// <summary>Whether the audio is currently playing.</summary>
 	bool IsPlaying { get; set; }
 
