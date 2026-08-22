@@ -1,7 +1,7 @@
 namespace OwlShed.Hushit.Data.Tracks;
 
 /// <summary>
-///   Represents an update to the <see cref="ITrackInfo"/>.
+/// 	Represents an update to the <see cref="ITrackInfo"/>.
 /// </summary>
 public interface ITrackUpdate
 {

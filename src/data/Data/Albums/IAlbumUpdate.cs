@@ -1,7 +1,7 @@
 namespace OwlShed.Hushit.Data.Albums;
 
 /// <summary>
-///   Represents an update to the <see cref="IAlbumInfo"/>.
+/// 	Represents an update to the <see cref="IAlbumInfo"/>.
 /// </summary>
 public interface IAlbumUpdate
 {

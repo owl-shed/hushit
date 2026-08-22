@@ -1,7 +1,7 @@
 namespace OwlShed.Hushit.Data.Albums;
 
 /// <summary>
-///   Represents information about an album.
+/// 	Represents information about an album.
 /// </summary>
 public interface IAlbumInfo : IDataModel<IAlbumUpdate>
 {
