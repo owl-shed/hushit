@@ -13,13 +13,31 @@ public static class Update
 	/// <param name="comparer">The comparer to use when determining whether the value has changed.</param>
 	/// <returns>A value representing the update.</returns>
 	/// <remarks>By default <see cref="EqualityComparer{T}.Default"/> will be used.</remarks>
-	public static ValueUpdate<T> Value<T>(T? oldValue, T newValue, IEqualityComparer<T>? comparer = null)
+	public static ValueUpdate<T> Value<T>(T? oldValue, [DisallowNull] T? newValue, IEqualityComparer<T>? comparer = null)
 		where T : notnull
 	{
 		comparer ??= EqualityComparer<T>.Default;
 
 		if (comparer.Equals(oldValue, newValue) is false)
 			return new(newValue);
+
+		return default;
+	}
+
+	/// <summary>Creates an update for value of the type <typeparamref name="T"/>.</summary>
+	/// <typeparam name="T">The type of the value to update.</typeparam>
+	/// <param name="oldValue">The old value.</param>
+	/// <param name="newValue">The new value.</param>
+	/// <param name="comparer">The comparer to use when determining whether the value has changed.</param>
+	/// <returns>A value representing the update.</returns>
+	/// <remarks>By default <see cref="EqualityComparer{T}.Default"/> will be used.</remarks>
+	public static ValueUpdate<T> Value<T>(T? oldValue, [DisallowNull] T? newValue, IEqualityComparer<T?>? comparer = null)
+		where T : struct
+	{
+		comparer ??= EqualityComparer<T?>.Default;
+
+		if (comparer.Equals(oldValue, newValue) is false)
+			return new(newValue.Value);
 
 		return default;
 	}

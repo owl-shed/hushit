@@ -202,7 +202,7 @@ public sealed class MutableAudioFile : MutableDataModelBase<MutableAudioFile, Au
 		return new()
 		{
 			Path = Update.Value(oldState.Path, Path),
-			Hash = oldState.Hash is null ? Hash.Value : Update.Value(oldState.Hash.Value, Hash.Value),
+			Hash = oldState.Hash is null ? Hash.Value : Update.Value(oldState.Hash, Hash),
 			TrackName = Update.Value(oldState.TrackName, TrackName),
 			TrackId = Update.Nullable(oldState.TrackId, TrackId),
 			TrackDate = Update.Nullable(oldState.TrackDate, TrackDate),
