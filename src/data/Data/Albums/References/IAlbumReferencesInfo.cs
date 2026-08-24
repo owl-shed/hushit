@@ -1,9 +1,9 @@
-namespace OwlShed.Hushit.Data.Albums;
+namespace OwlShed.Hushit.Data.Albums.References;
 
 /// <summary>
 /// 	Represents a data model that contains references to albums.
 /// </summary>
-public interface IAlbumReferencesInfo : IDataModel
+public interface IAlbumReferencesInfo : IDataModel<IAlbumReferencesUpdate>
 {
 	#region Properties
 	/// <summary>The ids of the related albums.</summary>

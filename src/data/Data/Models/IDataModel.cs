@@ -26,7 +26,7 @@ public interface IDataModel : INotifyPropertyChanged
 /// 	Represents the base interface for a data model.
 /// </summary>
 /// <typeparam name="TUpdate">The type that represents the model update builder.</typeparam>
-public interface IDataModel<TUpdate> : IDataModel
+public interface IDataModel<out TUpdate> : IDataModel
 	where TUpdate : notnull
 {
 	#region Methods
@@ -44,7 +44,7 @@ public interface IDataModel<TUpdate> : IDataModel
 /// </summary>
 /// <typeparam name="TUpdate">The type that represents the model update builder.</typeparam>
 /// <typeparam name="TMutable">The type that represents the mutable version of the data model.</typeparam>
-public interface IDataModel<TUpdate, TMutable> : IDataModel<TUpdate>
+public interface IDataModel<out TUpdate, out TMutable> : IDataModel<TUpdate>
 	where TUpdate : notnull
 	where TMutable : notnull, IMutableDataModel<TMutable, TUpdate>
 {

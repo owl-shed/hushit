@@ -1,9 +1,9 @@
-namespace OwlShed.Hushit.Data.Artists;
+namespace OwlShed.Hushit.Data.Artists.References;
 
 /// <summary>
 /// 	Represents a data model that contains references to artists.
 /// </summary>
-public interface IArtistReferencesInfo : IDataModel
+public interface IArtistReferencesInfo : IDataModel<IArtistReferencesUpdate>
 {
 	#region Properties
 	/// <summary>The ids of the related artists.</summary>
