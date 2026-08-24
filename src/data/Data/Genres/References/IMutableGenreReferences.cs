@@ -12,20 +12,11 @@ public interface IMutableGenreReferences
 }
 
 /// <summary>
-/// 	Represents a mutable version of the <see cref="IGenreReferencesInfo"/>.
-/// </summary>
-/// <typeparam name="TSelf">The type that implements the mutable interface.</typeparam>
-public interface IMutableGenreReferences<TSelf> : IMutableGenreReferences
-	where TSelf : notnull, IMutableGenreReferences<TSelf>
-{
-}
-
-/// <summary>
 /// 	Contains various extensions related to the <see cref="IMutableGenreReferences"/>.
 /// </summary>
 public static class IMutableGenreReferencesExtensions
 {
-	extension(IMutableGenreReferences mutable)
+	extension<TMutable>(TMutable mutable) where TMutable : notnull, IMutableGenreReferences
 	{
 		#region Methods
 		/// <summary>Adds a new related genre.</summary>
@@ -54,19 +45,14 @@ public static class IMutableGenreReferencesExtensions
 			mutable.GenreIds = [.. genreIds];
 			return mutable;
 		}
-		#endregion
-	}
 
-	extension<TMutable>(IMutableGenreReferences<TMutable> mutable) where TMutable : notnull, IMutableGenreReferences<TMutable>
-	{
-		#region Methods
 		/// <summary>Adds a new related genre.</summary>
 		/// <param name="genre">The genre to add.</param>
 		/// <returns>The used mutable genre references instance.</returns>
 		public TMutable AddGenre(IGenreInfo genre)
 		{
 			mutable.GenreIds.Add(genre.Id);
-			return (TMutable)mutable;
+			return mutable;
 		}
 
 		/// <summary>Removes a related genre.</summary>
@@ -75,7 +61,7 @@ public static class IMutableGenreReferencesExtensions
 		public TMutable RemoveGenre(IGenreInfo genre)
 		{
 			mutable.GenreIds.Remove(genre.Id);
-			return (TMutable)mutable;
+			return mutable;
 		}
 
 		/// <summary>Sets the new genre ids.</summary>
@@ -84,7 +70,7 @@ public static class IMutableGenreReferencesExtensions
 		public TMutable WithGenres(params IReadOnlyList<IGenreInfo> genres)
 		{
 			mutable.GenreIds = [.. genres.Select(static genre => genre.Id)];
-			return (TMutable)mutable;
+			return mutable;
 		}
 		#endregion
 	}

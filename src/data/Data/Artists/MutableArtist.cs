@@ -5,9 +5,9 @@ namespace OwlShed.Hushit.Data.Artists;
 /// </summary>
 public sealed class MutableArtist :
 	MutableDataModelBase<MutableArtist, ArtistUpdate>,
-	IMutableAlbumReferences<MutableArtist>,
-	IMutableTrackReferences<MutableArtist>,
-	IMutableGenreReferences<MutableArtist>
+	IMutableAlbumReferences,
+	IMutableTrackReferences,
+	IMutableGenreReferences
 {
 	#region Properties
 	/// <inheritdoc cref="IArtistInfo.Name"/>

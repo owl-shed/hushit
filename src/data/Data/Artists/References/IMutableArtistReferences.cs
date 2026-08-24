@@ -12,20 +12,11 @@ public interface IMutableArtistReferences
 }
 
 /// <summary>
-/// 	Represents a mutable version of the <see cref="IArtistReferencesInfo"/>.
-/// </summary>
-/// <typeparam name="TSelf">The type that implements the mutable interface.</typeparam>
-public interface IMutableArtistReferences<TSelf> : IMutableArtistReferences
-	where TSelf : notnull, IMutableArtistReferences<TSelf>
-{
-}
-
-/// <summary>
 /// 	Contains various extensions related to the <see cref="IMutableArtistReferences"/>.
 /// </summary>
 public static class IMutableArtistReferencesExtensions
 {
-	extension(IMutableArtistReferences mutable)
+	extension<TMutable>(TMutable mutable) where TMutable : notnull, IMutableArtistReferences
 	{
 		#region Methods
 		/// <summary>Adds a new related artist.</summary>
@@ -54,19 +45,14 @@ public static class IMutableArtistReferencesExtensions
 			mutable.ArtistIds = [.. artistIds];
 			return mutable;
 		}
-		#endregion
-	}
 
-	extension<TMutable>(IMutableArtistReferences<TMutable> mutable) where TMutable : notnull, IMutableArtistReferences<TMutable>
-	{
-		#region Methods
 		/// <summary>Adds a new related artist.</summary>
 		/// <param name="artist">The artist to add.</param>
 		/// <returns>The used mutable artist references instance.</returns>
 		public TMutable AddArtist(IArtistInfo artist)
 		{
 			mutable.ArtistIds.Add(artist.Id);
-			return (TMutable)mutable;
+			return mutable;
 		}
 
 		/// <summary>Removes a related artist.</summary>
@@ -75,7 +61,7 @@ public static class IMutableArtistReferencesExtensions
 		public TMutable RemoveArtist(IArtistInfo artist)
 		{
 			mutable.ArtistIds.Remove(artist.Id);
-			return (TMutable)mutable;
+			return mutable;
 		}
 
 		/// <summary>Sets the new artist ids.</summary>
@@ -84,7 +70,7 @@ public static class IMutableArtistReferencesExtensions
 		public TMutable WithArtists(params IReadOnlyList<IArtistInfo> artists)
 		{
 			mutable.ArtistIds = [.. artists.Select(static artist => artist.Id)];
-			return (TMutable)mutable;
+			return mutable;
 		}
 		#endregion
 	}

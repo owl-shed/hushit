@@ -12,20 +12,11 @@ public interface IMutableAlbumReferences
 }
 
 /// <summary>
-/// 	Represents a mutable version of the <see cref="IAlbumReferencesInfo"/>.
-/// </summary>
-/// <typeparam name="TSelf">The type that implements the mutable interface.</typeparam>
-public interface IMutableAlbumReferences<TSelf> : IMutableAlbumReferences
-	where TSelf : notnull, IMutableAlbumReferences<TSelf>
-{
-}
-
-/// <summary>
 /// 	Contains various extensions related to the <see cref="IMutableAlbumReferences"/>.
 /// </summary>
 public static class IMutableAlbumReferencesExtensions
 {
-	extension(IMutableAlbumReferences mutable)
+	extension<TMutable>(TMutable mutable) where TMutable : notnull, IMutableAlbumReferences
 	{
 		#region Methods
 		/// <summary>Adds a new related album.</summary>
@@ -55,10 +46,7 @@ public static class IMutableAlbumReferencesExtensions
 			return mutable;
 		}
 		#endregion
-	}
 
-	extension<TMutable>(IMutableAlbumReferences<TMutable> mutable) where TMutable : notnull, IMutableAlbumReferences<TMutable>
-	{
 		#region Methods
 		/// <summary>Adds a new related album.</summary>
 		/// <param name="album">The album to add.</param>
@@ -66,7 +54,7 @@ public static class IMutableAlbumReferencesExtensions
 		public TMutable AddAlbum(IAlbumInfo album)
 		{
 			mutable.AlbumIds.Add(album.Id);
-			return (TMutable)mutable;
+			return mutable;
 		}
 
 		/// <summary>Removes a related album.</summary>
@@ -75,7 +63,7 @@ public static class IMutableAlbumReferencesExtensions
 		public TMutable RemoveAlbum(IAlbumInfo album)
 		{
 			mutable.AlbumIds.Remove(album.Id);
-			return (TMutable)mutable;
+			return mutable;
 		}
 
 		/// <summary>Sets the new album ids.</summary>
@@ -84,7 +72,7 @@ public static class IMutableAlbumReferencesExtensions
 		public TMutable WithAlbums(params IReadOnlyList<IAlbumInfo> albums)
 		{
 			mutable.AlbumIds = [.. albums.Select(static album => album.Id)];
-			return (TMutable)mutable;
+			return mutable;
 		}
 		#endregion
 	}

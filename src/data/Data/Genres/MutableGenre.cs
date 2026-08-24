@@ -5,9 +5,9 @@ namespace OwlShed.Hushit.Data.Genres;
 /// </summary>
 public sealed class MutableGenre :
 	MutableDataModelBase<MutableGenre, GenreUpdate>,
-	IMutableArtistReferences<MutableGenre>,
-	IMutableAlbumReferences<MutableGenre>,
-	IMutableTrackReferences<MutableGenre>
+	IMutableArtistReferences,
+	IMutableAlbumReferences,
+	IMutableTrackReferences
 {
 	#region Properties
 	/// <inheritdoc cref="IGenreInfo.Name"/>

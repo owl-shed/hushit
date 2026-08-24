@@ -5,8 +5,8 @@ namespace OwlShed.Hushit.Data.Tracks;
 /// </summary>
 public sealed class MutableTrack :
 	MutableDataModelBase<MutableTrack, TrackUpdate>,
-	IMutableArtistReferences<MutableTrack>,
-	IMutableGenreReferences<MutableTrack>
+	IMutableArtistReferences,
+	IMutableGenreReferences
 {
 	#region Properties
 	/// <inheritdoc cref="ITrackInfo.Name"/>
