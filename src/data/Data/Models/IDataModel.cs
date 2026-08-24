@@ -1,4 +1,4 @@
-namespace OwlShed.Hushit.Data;
+namespace OwlShed.Hushit.Data.Models;
 
 /// <summary>
 /// 	Represents the base interface for a data model.
@@ -36,5 +36,21 @@ public interface IDataModel<TUpdate> : IDataModel
 	/// <returns><see langword="true"/> if any changes were made, <see langword="false"/> otherwise.</returns>
 	/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
 	ValueTask<bool> UpdateAsync(Action<TUpdate> callback, CancellationToken cancellation = default);
+	#endregion
+}
+
+/// <summary>
+/// 	Represents the base interface for a data model.
+/// </summary>
+/// <typeparam name="TUpdate">The type that represents the model update builder.</typeparam>
+/// <typeparam name="TMutable">The type that represents the mutable version of the data model.</typeparam>
+public interface IDataModel<TUpdate, TMutable> : IDataModel<TUpdate>
+	where TUpdate : notnull
+	where TMutable : notnull, IMutableDataModel<TMutable, TUpdate>
+{
+	#region Methods
+	/// <summary>Gets a mutable version of the data model, which can be used to generate an update.</summary>
+	/// <returns>A copy of the current data model, as a mutable version.</returns>
+	TMutable ToMutable();
 	#endregion
 }
