@@ -3,10 +3,10 @@ namespace OwlShed.Hushit.Data.AudioFiles;
 /// <summary>
 /// 	Represents a repository for audio files.
 /// </summary>
-public interface IAudioFileRepository : IDataRepository<IAudioFileInfo, IAudioFileUpdate>
+public interface IAudioFileRepository : IDataRepository<IAudioFileInfo, MutableAudioFile, AudioFileUpdate>
 {
 	#region Methods
-	/// <inheritdoc cref="IDataRepository{TModel, TUpdate}.CreateAsync(Action{TUpdate}, CancellationToken)"/>
+	/// <inheritdoc cref="IDataRepository{TModel, TMutable}.CreateAsync(Action{TMutable}, CancellationToken)"/>
 	/// <remarks>
 	/// 	Every audio file requires:
 	/// 	<list type="bullet">
@@ -15,7 +15,7 @@ public interface IAudioFileRepository : IDataRepository<IAudioFileInfo, IAudioFi
 	/// 		<item>A track name (if missing from metadata, the name of the file can be used).</item>
 	/// 	</list>
 	/// </remarks>
-	new ValueTask<IAudioFileInfo> CreateAsync(Action<IAudioFileUpdate> callback, CancellationToken cancellation = default);
+	new ValueTask<IAudioFileInfo> CreateAsync(Action<MutableAudioFile> callback, CancellationToken cancellation = default);
 
 	/// <summary>Creates a new data model.</summary>
 	/// <param name="path">The path of the audio file.</param>
