@@ -26,16 +26,16 @@ public interface IAudioFileInfo : IDataModel<IAudioFileUpdate>
 	DateInfo? AlbumDate { get; }
 
 	/// <summary>The names of the artists that made the track.</summary>
-	IReadOnlyList<string> TrackArtists { get; }
+	ReadOnlyObservableCollection<string> TrackArtists { get; }
 
 	/// <summary>The names of the artists that made the album.</summary>
-	IReadOnlyList<string> AlbumArtists { get; }
+	ReadOnlyObservableCollection<string> AlbumArtists { get; }
 
 	/// <summary>The names of the genres that the track belongs to.</summary>
-	IReadOnlyList<string> TrackGenres { get; }
+	ReadOnlyObservableCollection<string> TrackGenres { get; }
 
 	/// <summary>The names of the genres that the album belongs to.</summary>
-	IReadOnlyList<string> AlbumGenres { get; }
+	ReadOnlyObservableCollection<string> AlbumGenres { get; }
 
 	/// <summary>The id of the track that the audio file is linked to.</summary>
 	string? TrackId { get; }

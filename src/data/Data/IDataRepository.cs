@@ -89,14 +89,14 @@ public interface IDataRepository<TModel, TUpdate> : IDataRepository<TModel>
 	/// <exception cref="InvalidOperationException">Thrown if the <paramref name="callback"/> didn't provide the required information.</exception>
 	ValueTask<TModel> CreateAsync(Action<TUpdate> callback, CancellationToken cancellation = default);
 
-	/// <summary>Updates the given <paramref name="model"/>.</summary>
-	/// <param name="model">The data model to update.</param>
+	/// <summary>Updates the given <paramref name="id"/>.</summary>
+	/// <param name="id">The id of the data model to update.</param>
 	/// <param name="callback">A callback that can be used to update the data model.</param>
 	/// <param name="cancellation">A cancellation token that can be used to cancel the operation.</param>
-	/// <returns><see langword="true"/> if any changes were made to the data <paramref name="model"/>, <see langword="false"/> otherwise.</returns>
+	/// <returns><see langword="true"/> if any changes were made to the data <paramref name="id"/>, <see langword="false"/> otherwise.</returns>
 	/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
-	/// <exception cref="ArgumentException">Thrown if the data <paramref name="model"/> no longer existed in the repository.</exception>
-	ValueTask<bool> UpdateAsync(TModel model, Action<TUpdate> callback, CancellationToken cancellation = default);
+	/// <exception cref="ArgumentException">Thrown if the data model with the given <paramref name="id"/> no longer existed in the repository.</exception>
+	ValueTask<bool> UpdateAsync(string id, Action<TUpdate> callback, CancellationToken cancellation = default);
 	#endregion
 }
 
@@ -156,7 +156,6 @@ public static class IDataRepositoryExtensions
 		public async ValueTask<bool> RemoveAsync(TModel model, CancellationToken cancellation = default)
 		{
 			cancellation.ThrowIfCancellationRequested();
-
 			return await repository.RemoveAsync(model.Id, cancellation).ConfigureAwait(false);
 		}
 		#endregion
@@ -167,22 +166,17 @@ public static class IDataRepositoryExtensions
 		where TUpdate : notnull
 	{
 		#region Methods
-		/// <summary>Updates the data model with the given <paramref name="id"/>..</summary>
-		/// <param name="id">The id of the data model to update.</param>
+		/// <summary>Updates the data model with the given <paramref name="model"/>..</summary>
+		/// <param name="model">The data model to update.</param>
 		/// <param name="callback">A callback that can be used to update the data model.</param>
 		/// <param name="cancellation">A cancellation token that can be used to cancel the operation.</param>
 		/// <returns><see langword="true"/> if any changes were made to the data model, <see langword="false"/> otherwise.</returns>
 		/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
 		/// <exception cref="ArgumentException">Thrown if the data model no longer existed in the repository.</exception>
-		public async ValueTask<bool> UpdateAsync(string id, Action<TUpdate> callback, CancellationToken cancellation = default)
+		public async ValueTask<bool> UpdateAsync(TModel model, Action<TUpdate> callback, CancellationToken cancellation = default)
 		{
 			cancellation.ThrowIfCancellationRequested();
-
-			TModel? model = await repository.TryGetAsync(id, cancellation).ConfigureAwait(false);
-			if (model is null)
-				ThrowHelper.ThrowArgumentException(nameof(id), $"No data model with the given id ({id}) existed in the repository.");
-
-			return await repository.UpdateAsync(model, callback, cancellation).ConfigureAwait(false);
+			return await repository.UpdateAsync(model.Id, callback, cancellation).ConfigureAwait(false);
 		}
 		#endregion
 	}
