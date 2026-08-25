@@ -3,6 +3,8 @@ global using System.IO;
 
 global using CommunityToolkit.Diagnostics;
 
+global using OwlShed.Hushit.Common;
+
 global using OwlShed.Hushit.Data.Albums;
 global using OwlShed.Hushit.Data.Albums.References;
 global using OwlShed.Hushit.Data.Artists;

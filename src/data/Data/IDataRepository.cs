@@ -38,6 +38,14 @@ public interface IDataRepository
 public interface IDataRepository<TModel> : IDataRepository
 	where TModel : notnull, IDataModel
 {
+	#region Events
+	/// <summary>An event that is raised when a new model is added.</summary>
+	IAsyncEvent<TModel> ModelAdded { get; }
+
+	/// <summary>An event that is raised when a new model is removed.</summary>
+	IAsyncEvent<TModel> ModelRemoved { get; }
+	#endregion
+
 	#region Methods
 	/// <summary>Gets all of the data models stored in the repository.</summary>
 	/// <param name="cancellation">A cancellation token that can be used to cancel the operation.</param>
@@ -101,6 +109,47 @@ public interface IDataRepository<TModel, TMutable> : IDataRepository<TModel>
 }
 
 /// <summary>
+/// 	Represents the arguments for a model update event.
+/// </summary>
+/// <typeparam name="TModel">The type of the model that was updated.</typeparam>
+/// <typeparam name="TMutable">The type for the mutable version of the <typeparamref name="TModel"/>.</typeparam>
+/// <typeparam name="TUpdate">The type that represents the update between two <typeparamref name="TMutable"/> instances.</typeparam>
+public readonly struct ModelUpdateInfo<TModel, TMutable, TUpdate>
+	where TModel : notnull, IDataModel<TUpdate, TMutable>
+	where TMutable : notnull, IMutableDataModel<TMutable, TUpdate>
+	where TUpdate : notnull
+{
+	#region Properties
+	/// <summary>The model that was updated.</summary>
+	public TModel Model { get; }
+
+	/// <summary>The old state of the model.</summary>
+	public TMutable Old { get; }
+
+	/// <summary>The new state of the model.</summary>
+	public TMutable New { get; }
+
+	/// <summary>The update from the old state, to the new state of the model.</summary>
+	public TUpdate Update { get; }
+	#endregion
+
+	#region Constructors
+	/// <summary>Creates a new instance of the <see cref="ModelUpdateInfo{TModel, TMutable, TUpdate}"/>.</summary>
+	/// <param name="model">The model that was updated.</param>
+	/// <param name="oldState">The old state of the model.</param>
+	/// <param name="newState">The new state of the model.</param>
+	/// <param name="update">The update from the old state, to the new state of the model.</param>
+	public ModelUpdateInfo(TModel model, TMutable oldState, TMutable newState, TUpdate update)
+	{
+		Model = model;
+		Old = oldState;
+		New = newState;
+		Update = update;
+	}
+	#endregion
+}
+
+/// <summary>
 /// 	Represents a data model repository.
 /// </summary>
 /// <typeparam name="TModel">The type of the models that the repository manages.</typeparam>
@@ -111,6 +160,10 @@ public interface IDataRepository<TModel, TMutable, TUpdate> : IDataRepository<TM
 	where TMutable : notnull, IMutableDataModel<TMutable, TUpdate>
 	where TUpdate : notnull
 {
+	#region Events
+	/// <summary>An event that is raised when an existing model is updated.</summary>
+	IAsyncEvent<ModelUpdateInfo<TModel, TMutable, TUpdate>> ModelUpdated { get; }
+	#endregion
 }
 
 /// <summary>
