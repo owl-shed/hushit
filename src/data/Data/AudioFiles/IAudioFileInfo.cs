@@ -3,7 +3,7 @@ namespace OwlShed.Hushit.Data.AudioFiles;
 /// <summary>
 /// 	Represents information about an audio file.
 /// </summary>
-public interface IAudioFileInfo : IDataModel<AudioFileUpdate, MutableAudioFile>
+public interface IAudioFileInfo : IDataModel<MutableAudioFile, AudioFileUpdate>
 {
 	#region Properties
 	/// <summary>The local path to the audio file.</summary>

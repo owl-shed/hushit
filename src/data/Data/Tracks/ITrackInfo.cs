@@ -3,7 +3,7 @@ namespace OwlShed.Hushit.Data.Tracks;
 /// <summary>
 /// 	Represents information about a track.
 /// </summary>
-public interface ITrackInfo : IDataModel<TrackUpdate, MutableTrack>, IArtistReferencesInfo, IGenreReferencesInfo
+public interface ITrackInfo : IDataModel<MutableTrack, TrackUpdate>, IArtistReferencesInfo, IGenreReferencesInfo
 {
 	#region Properties
 	/// <summary>The name of the track.</summary>

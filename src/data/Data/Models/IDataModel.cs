@@ -25,9 +25,9 @@ public interface IDataModel : INotifyPropertyChanged
 /// <summary>
 /// 	Represents the base interface for a data model.
 /// </summary>
-/// <typeparam name="TUpdate">The type that represents the model update builder.</typeparam>
-public interface IDataModel<out TUpdate> : IDataModel
-	where TUpdate : notnull
+/// <typeparam name="TMutable">The type that represents the mutable version of the model.</typeparam>
+public interface IDataModel<out TMutable> : IDataModel
+	where TMutable : notnull
 {
 	#region Methods
 	/// <summary>Updates the data model.</summary>
@@ -35,7 +35,11 @@ public interface IDataModel<out TUpdate> : IDataModel
 	/// <param name="cancellation">A cancellation token that can be used to cancel the operation.</param>
 	/// <returns><see langword="true"/> if any changes were made, <see langword="false"/> otherwise.</returns>
 	/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
-	ValueTask<bool> UpdateAsync(Action<TUpdate> callback, CancellationToken cancellation = default);
+	ValueTask<bool> UpdateAsync(Action<TMutable> callback, CancellationToken cancellation = default);
+
+	/// <summary>Gets a mutable version of the data model, which can be used to generate an update.</summary>
+	/// <returns>A copy of the current data model, as a mutable version.</returns>
+	TMutable ToMutable();
 	#endregion
 }
 
@@ -44,13 +48,8 @@ public interface IDataModel<out TUpdate> : IDataModel
 /// </summary>
 /// <typeparam name="TUpdate">The type that represents the model update builder.</typeparam>
 /// <typeparam name="TMutable">The type that represents the mutable version of the data model.</typeparam>
-public interface IDataModel<out TUpdate, out TMutable> : IDataModel<TUpdate>
-	where TUpdate : notnull
+public interface IDataModel<out TMutable, out TUpdate> : IDataModel<TMutable>
 	where TMutable : notnull, IMutableDataModel<TMutable, TUpdate>
+	where TUpdate : notnull
 {
-	#region Methods
-	/// <summary>Gets a mutable version of the data model, which can be used to generate an update.</summary>
-	/// <returns>A copy of the current data model, as a mutable version.</returns>
-	TMutable ToMutable();
-	#endregion
 }

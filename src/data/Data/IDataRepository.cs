@@ -115,7 +115,7 @@ public interface IDataRepository<TModel, TMutable> : IDataRepository<TModel>
 /// <typeparam name="TMutable">The type for the mutable version of the <typeparamref name="TModel"/>.</typeparam>
 /// <typeparam name="TUpdate">The type that represents the update between two <typeparamref name="TMutable"/> instances.</typeparam>
 public readonly struct ModelUpdateInfo<TModel, TMutable, TUpdate>
-	where TModel : notnull, IDataModel<TUpdate, TMutable>
+	where TModel : notnull, IDataModel<TMutable, TUpdate>
 	where TMutable : notnull, IMutableDataModel<TMutable, TUpdate>
 	where TUpdate : notnull
 {
@@ -156,7 +156,7 @@ public readonly struct ModelUpdateInfo<TModel, TMutable, TUpdate>
 /// <typeparam name="TMutable">The type that represents the mutable <typeparamref name="TModel"/>.</typeparam>
 /// <typeparam name="TUpdate">The type that represents an update between two <typeparamref name="TMutable"/> instances.</typeparam>
 public interface IDataRepository<TModel, TMutable, TUpdate> : IDataRepository<TModel, TMutable>
-	where TModel : notnull, IDataModel<TUpdate, TMutable>
+	where TModel : notnull, IDataModel<TMutable, TUpdate>
 	where TMutable : notnull, IMutableDataModel<TMutable, TUpdate>
 	where TUpdate : notnull
 {
