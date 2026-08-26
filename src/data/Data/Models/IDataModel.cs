@@ -37,6 +37,13 @@ public interface IDataModel<out TMutable> : IDataModel
 	/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
 	ValueTask<bool> UpdateAsync(Action<TMutable> callback, CancellationToken cancellation = default);
 
+	/// <summary>Updates the data model.</summary>
+	/// <param name="callback">The callback which can be used to customise the data model.</param>
+	/// <param name="cancellation">A cancellation token that can be used to cancel the operation.</param>
+	/// <returns><see langword="true"/> if any changes were made, <see langword="false"/> otherwise.</returns>
+	/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
+	ValueTask<bool> UpdateAsync(Func<TMutable, CancellationToken, ValueTask> callback, CancellationToken cancellation = default);
+
 	/// <summary>Gets a mutable version of the data model, which can be used to generate an update.</summary>
 	/// <returns>A copy of the current data model, as a mutable version.</returns>
 	TMutable ToMutable();

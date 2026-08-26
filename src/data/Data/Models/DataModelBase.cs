@@ -39,14 +39,21 @@ internal abstract class DataModelBase<TModel, TMutable, TUpdate> : ObservableBas
 	public async ValueTask<bool> UpdateAsync(Action<TMutable> callback, CancellationToken cancellation = default)
 	{
 		cancellation.ThrowIfCancellationRequested();
-		return await Repository.UpdateAsync(Id, callback, cancellation);
+		return await Repository.UpdateAsync(Id, callback, cancellation).ConfigureAwait(false);
+	}
+
+	/// <inheritdoc/>
+	public async ValueTask<bool> UpdateAsync(Func<TMutable, CancellationToken, ValueTask> callback, CancellationToken cancellation = default)
+	{
+		cancellation.ThrowIfCancellationRequested();
+		return await Repository.UpdateAsync(Id, callback, cancellation).ConfigureAwait(false);
 	}
 
 	/// <inheritdoc/>
 	public async ValueTask<bool> RemoveAsync(CancellationToken cancellation = default)
 	{
 		cancellation.ThrowIfCancellationRequested();
-		return await Repository.RemoveAsync(Id, cancellation);
+		return await Repository.RemoveAsync(Id, cancellation).ConfigureAwait(false);
 	}
 
 	/// <inheritdoc/>

@@ -97,6 +97,14 @@ public interface IDataRepository<TModel, TMutable> : IDataRepository<TModel>
 	/// <exception cref="InvalidOperationException">Thrown if the <paramref name="callback"/> didn't provide the required information.</exception>
 	ValueTask<TModel> CreateAsync(Action<TMutable> callback, CancellationToken cancellation = default);
 
+	/// <summary>Creates a new data model.</summary>
+	/// <param name="callback">A callback that can be used to set the initial information about the data model.</param>
+	/// <param name="cancellation">A cancellation token that can be used to cancel the operation.</param>
+	/// <returns>The created data model.</returns>
+	/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
+	/// <exception cref="InvalidOperationException">Thrown if the <paramref name="callback"/> didn't provide the required information.</exception>
+	ValueTask<TModel> CreateAsync(Func<TMutable, CancellationToken, ValueTask> callback, CancellationToken cancellation = default);
+
 	/// <summary>Updates the given <paramref name="id"/>.</summary>
 	/// <param name="id">The id of the data model to update.</param>
 	/// <param name="callback">A callback that can be used to update the data model.</param>
@@ -105,6 +113,15 @@ public interface IDataRepository<TModel, TMutable> : IDataRepository<TModel>
 	/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
 	/// <exception cref="ArgumentException">Thrown if the data model with the given <paramref name="id"/> no longer existed in the repository.</exception>
 	ValueTask<bool> UpdateAsync(string id, Action<TMutable> callback, CancellationToken cancellation = default);
+
+	/// <summary>Updates the given <paramref name="id"/>.</summary>
+	/// <param name="id">The id of the data model to update.</param>
+	/// <param name="callback">A callback that can be used to update the data model.</param>
+	/// <param name="cancellation">A cancellation token that can be used to cancel the operation.</param>
+	/// <returns><see langword="true"/> if any changes were made to the data <paramref name="id"/>, <see langword="false"/> otherwise.</returns>
+	/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
+	/// <exception cref="ArgumentException">Thrown if the data model with the given <paramref name="id"/> no longer existed in the repository.</exception>
+	ValueTask<bool> UpdateAsync(string id, Func<TMutable, CancellationToken, ValueTask> callback, CancellationToken cancellation = default);
 	#endregion
 }
 
@@ -240,6 +257,19 @@ public static class IDataRepositoryExtensions
 		/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
 		/// <exception cref="ArgumentException">Thrown if the data model no longer existed in the repository.</exception>
 		public async ValueTask<bool> UpdateAsync(TModel model, Action<TMutable> callback, CancellationToken cancellation = default)
+		{
+			cancellation.ThrowIfCancellationRequested();
+			return await repository.UpdateAsync(model.Id, callback, cancellation).ConfigureAwait(false);
+		}
+
+		/// <summary>Updates the data model with the given <paramref name="model"/>..</summary>
+		/// <param name="model">The data model to update.</param>
+		/// <param name="callback">A callback that can be used to update the data model.</param>
+		/// <param name="cancellation">A cancellation token that can be used to cancel the operation.</param>
+		/// <returns><see langword="true"/> if any changes were made to the data model, <see langword="false"/> otherwise.</returns>
+		/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
+		/// <exception cref="ArgumentException">Thrown if the data model no longer existed in the repository.</exception>
+		public async ValueTask<bool> UpdateAsync(TModel model, Func<TMutable, CancellationToken, ValueTask> callback, CancellationToken cancellation = default)
 		{
 			cancellation.ThrowIfCancellationRequested();
 			return await repository.UpdateAsync(model.Id, callback, cancellation).ConfigureAwait(false);

@@ -40,6 +40,26 @@ internal abstract class DataRepositoryBase<TModel, TMutable, TUpdate, TTypedMode
 
 	#region Methods
 	/// <inheritdoc/>
+	public async ValueTask<TModel> CreateAsync(Func<TMutable, CancellationToken, ValueTask> callback, CancellationToken cancellation = default)
+	{
+		cancellation.ThrowIfCancellationRequested();
+
+		TMutable mutable = new();
+		await callback.Invoke(mutable, cancellation).ConfigureAwait(false);
+
+		string id = CreateNewId();
+		TTypedModel model = Create(id, mutable);
+		Cache(model);
+
+		await PersistAsync(model, cancellation).ConfigureAwait(false);
+
+		await OnCreatedAsync(model, cancellation).ConfigureAwait(false);
+		await _modelAdded.RaiseSequentialAsync(model, cancellation).ConfigureAwait(false);
+
+		return model;
+	}
+
+	/// <inheritdoc/>
 	public async ValueTask<TModel> CreateAsync(Action<TMutable> callback, CancellationToken cancellation = default)
 	{
 		cancellation.ThrowIfCancellationRequested();
@@ -107,6 +127,28 @@ internal abstract class DataRepositoryBase<TModel, TMutable, TUpdate, TTypedMode
 		TMutable newState = model.ToMutable();
 
 		callback.Invoke(newState);
+		TUpdate update = newState.GetUpdateFrom(oldState);
+
+		CopyState(model, oldState, newState, update);
+		await PersistAsync(model, cancellation).ConfigureAwait(false);
+
+		await OnUpdateAsync(model, oldState, newState, update, cancellation).ConfigureAwait(false);
+		await _modelUpdated.RaiseSequentialAsync(new(model, oldState, newState, update), cancellation).ConfigureAwait(false);
+
+		return true;
+	}
+
+	/// <inheritdoc/>
+	public async ValueTask<bool> UpdateAsync(string id, Func<TMutable, CancellationToken, ValueTask> callback, CancellationToken cancellation = default)
+	{
+		TTypedModel? model = await TryGetCoreAsync(id, cancellation).ConfigureAwait(false);
+		if (model?.Exists is not true)
+			ThrowHelper.ThrowArgumentException(nameof(id), $"The data model with the given id ({id}) no longer existed.");
+
+		TMutable oldState = model.ToMutable();
+		TMutable newState = model.ToMutable();
+
+		await callback.Invoke(newState, cancellation).ConfigureAwait(false);
 		TUpdate update = newState.GetUpdateFrom(oldState);
 
 		CopyState(model, oldState, newState, update);
