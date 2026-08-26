@@ -16,11 +16,14 @@ public interface IAudioFileInfo : IDataModel<MutableAudioFile, AudioFileUpdate>
 	/// <remarks>If the value couldn't be loaded from the metadata, then the name of the audio file will be used.</remarks>
 	string TrackName { get; }
 
+	/// <summary>The id of the track that the audio file is linked to.</summary>
+	string? TrackId { get; }
+
 	/// <summary>The date that the track was released on.</summary>
 	DateInfo? TrackDate { get; }
 
 	/// <summary>The name of the album that the audio track belongs to.</summary>
-	string? Album { get; }
+	string? AlbumName { get; }
 
 	/// <summary>The date that the album was released on.</summary>
 	DateInfo? AlbumDate { get; }
@@ -36,9 +39,6 @@ public interface IAudioFileInfo : IDataModel<MutableAudioFile, AudioFileUpdate>
 
 	/// <summary>The names of the genres that the album belongs to.</summary>
 	ReadOnlyObservableCollection<string> AlbumGenres { get; }
-
-	/// <summary>The id of the track that the audio file is linked to.</summary>
-	string? TrackId { get; }
 	#endregion
 
 	#region Methods

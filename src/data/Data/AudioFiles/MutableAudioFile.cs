@@ -21,8 +21,8 @@ public sealed class MutableAudioFile : MutableDataModelBase<MutableAudioFile, Au
 	/// <inheritdoc cref="IAudioFileInfo.TrackDate"/>
 	public DateInfo? TrackDate { get; set; }
 
-	/// <inheritdoc cref="IAudioFileInfo.Album"/>
-	public string? Album { get; set; }
+	/// <inheritdoc cref="IAudioFileInfo.AlbumName"/>
+	public string? AlbumName { get; set; }
 
 	/// <inheritdoc cref="IAudioFileInfo.AlbumDate"/>
 	public DateInfo? AlbumDate { get; set; }
@@ -79,12 +79,12 @@ public sealed class MutableAudioFile : MutableDataModelBase<MutableAudioFile, Au
 	/// <returns>The used mutable audio file instance.</returns>
 	/// <exception cref="ArgumentException">Thrown if the given name was empty.</exception>
 	/// <remarks>A <see langword="null"/> value is allowed in order to remove the album name.</remarks>
-	public MutableAudioFile WithAlbum(string? name)
+	public MutableAudioFile WithAlbumName(string? name)
 	{
 		if (name is not null)
 			Guard.IsNotNullOrWhiteSpace(name);
 
-		Album = name;
+		AlbumName = name;
 		return this;
 	}
 
@@ -206,7 +206,7 @@ public sealed class MutableAudioFile : MutableDataModelBase<MutableAudioFile, Au
 			TrackName = Update.Value(oldState.TrackName, TrackName),
 			TrackId = Update.Nullable(oldState.TrackId, TrackId),
 			TrackDate = Update.Nullable(oldState.TrackDate, TrackDate),
-			Album = Update.Nullable(oldState.Album, Album),
+			AlbumName = Update.Nullable(oldState.AlbumName, AlbumName),
 			AlbumDate = Update.Nullable(oldState.AlbumDate, AlbumDate),
 			TrackArtists = Update.List(oldState.TrackArtists, TrackArtists),
 			AlbumArtists = Update.List(oldState.AlbumArtists, AlbumArtists),

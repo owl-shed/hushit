@@ -21,8 +21,8 @@ public sealed class AudioFileUpdate
 	/// <inheritdoc cref="IAudioFileInfo.TrackDate"/>
 	public NullableUpdate<DateInfo?> TrackDate { get; set; }
 
-	/// <inheritdoc cref="IAudioFileInfo.Album"/>
-	public NullableUpdate<string> Album { get; set; }
+	/// <inheritdoc cref="IAudioFileInfo.AlbumName"/>
+	public NullableUpdate<string> AlbumName { get; set; }
 
 	/// <inheritdoc cref="IAudioFileInfo.AlbumDate"/>
 	public NullableUpdate<DateInfo?> AlbumDate { get; set; }

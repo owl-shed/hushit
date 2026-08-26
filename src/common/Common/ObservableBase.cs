@@ -18,7 +18,7 @@ public abstract class ObservableBase : INotifyPropertyChanged
 	/// <param name="property">The name of the property that is being updated.</param>
 	/// <returns></returns>
 	/// <remarks>Equality is determined using <see cref="EqualityComparer{T}.Default"/>.</remarks>
-	protected bool TrySet<T>(ref T field, T newValue, [CallerMemberName] string? property = null)
+	protected virtual bool TrySet<T>(ref T field, T newValue, [CallerMemberName] string? property = null)
 	{
 		if (EqualityComparer<T>.Default.Equals(field, newValue))
 			return false;
