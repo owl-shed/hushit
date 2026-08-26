@@ -53,5 +53,14 @@ public sealed class AudioFileUpdate
 
 	/// <inheritdoc cref="IAudioFileInfo.AudioFormat"/>
 	public NullableUpdate<string> AudioFormat { get; set; }
+
+	/// <inheritdoc cref="IAudioFileInfo.BitRate"/>
+	public NullableUpdate<int?> BitRate { get; set; }
+
+	/// <inheritdoc cref="IAudioFileInfo.SampleRate"/>
+	public NullableUpdate<int?> SampleRate { get; set; }
+
+	/// <inheritdoc cref="IAudioFileInfo.Channels"/>
+	public NullableUpdate<int?> Channels { get; set; }
 	#endregion
 }

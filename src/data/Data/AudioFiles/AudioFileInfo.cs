@@ -92,6 +92,15 @@ internal sealed class AudioFileInfo : DataModelBase<IAudioFileInfo, MutableAudio
 			return $"{ContainerFormat}/{AudioFormat}";
 		}
 	}
+
+	/// <inheritdoc/>
+	public int? BitRate { get => Read(ref field); private set => TrySet(ref field, value); }
+
+	/// <inheritdoc/>
+	public int? SampleRate { get => Read(ref field); private set => TrySet(ref field, value); }
+
+	/// <inheritdoc/>
+	public int? Channels { get => Read(ref field); private set => TrySet(ref field, value); }
 	#endregion
 
 	#region Constructors
@@ -156,6 +165,9 @@ internal sealed class AudioFileInfo : DataModelBase<IAudioFileInfo, MutableAudio
 			TotalTracks = TotalTracks,
 			ContainerFormat = ContainerFormat,
 			AudioFormat = AudioFormat,
+			BitRate = BitRate,
+			SampleRate = SampleRate,
+			Channels = Channels,
 		};
 	}
 	internal override void CopyState(MutableAudioFile state)
@@ -189,6 +201,9 @@ internal sealed class AudioFileInfo : DataModelBase<IAudioFileInfo, MutableAudio
 		TotalTracks = state.TotalTracks;
 		ContainerFormat = state.ContainerFormat;
 		AudioFormat = state.AudioFormat;
+		BitRate = state.BitRate;
+		SampleRate = state.SampleRate;
+		Channels = state.Channels;
 	}
 	#endregion
 }

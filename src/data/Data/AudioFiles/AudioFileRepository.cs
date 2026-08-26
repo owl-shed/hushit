@@ -57,6 +57,15 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 
 		[JsonPropertyName("audio_format")]
 		public required string? AudioFormat { get; init; }
+
+		[JsonPropertyName("bit_rate")]
+		public required int? BitRate { get; init; }
+
+		[JsonPropertyName("sample_rate")]
+		public required int? SampleRate { get; init; }
+
+		[JsonPropertyName("channels")]
+		public required int? Channels { get; init; }
 		#endregion
 	}
 	#endregion
@@ -152,6 +161,9 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 			TotalTracks = mutable.TotalTracks,
 			ContainerFormat = mutable.ContainerFormat,
 			AudioFormat = mutable.AudioFormat,
+			BitRate = mutable.BitRate,
+			SampleRate = mutable.SampleRate,
+			Channels = mutable.Channels,
 		};
 
 	}
@@ -175,6 +187,9 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 			TotalTracks = json.TotalTracks,
 			ContainerFormat = json.ContainerFormat,
 			AudioFormat = json.AudioFormat,
+			BitRate = json.BitRate,
+			SampleRate = json.SampleRate,
+			Channels = json.Channels,
 		};
 	}
 	#endregion

@@ -57,6 +57,15 @@ public interface IAudioFileInfo : IDataModel<MutableAudioFile, AudioFileUpdate>
 
 	/// <summary>The format string to display.</summary>
 	string? DisplayFormat { get; }
+
+	/// <summary>The bit-rate of the audio data.</summary>
+	int? BitRate { get; }
+
+	/// <summary>The sample rate of the audio data.</summary>
+	int? SampleRate { get; }
+
+	/// <summary>The amount of channels in the audio date.</summary>
+	int? Channels { get; }
 	#endregion
 
 	#region Methods

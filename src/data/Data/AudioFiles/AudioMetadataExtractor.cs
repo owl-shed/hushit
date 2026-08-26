@@ -33,14 +33,28 @@ internal static class AudioMetadataExtractor
 	}
 	private static void ExtractMetadata(JsonElement format, JsonElement audio, JsonElement tags, MutableAudioFile file)
 	{
-		if (format.TryGetProperty("duration", out JsonElement durationElement) && double.TryParse(durationElement.GetString(), null, out double seconds))
+		bool TryGetFormatProperty(out JsonElement element, params ReadOnlySpan<string> names)
+		{
+			return AudioMetadataExtractor.TryGetFormatProperty(audio, format, out element, names);
+		}
+
+		if (TryGetFormatProperty(out JsonElement duration, "duration") && TryGetDouble(duration, out double seconds))
 			file.Duration = TimeSpan.FromSeconds(seconds);
 
-		if (format.TryGetProperty("format_name", out JsonElement container))
+		if (TryGetFormatProperty(out JsonElement container, "format_name", "format_long_name"))
 			file.ContainerFormat = container.GetString();
 
-		if (audio.TryGetProperty("codec_name", out JsonElement codec))
+		if (TryGetFormatProperty(out JsonElement codec, "codec_name", "codec_long_name"))
 			file.AudioFormat = codec.GetString();
+
+		if (TryGetFormatProperty(out JsonElement bitrateElement, "bit_rate") && TryGetInt32(bitrateElement, out int bitrate))
+			file.BitRate = bitrate;
+
+		if (TryGetFormatProperty(out JsonElement sampleRateElement, "sample_rate") && TryGetInt32(sampleRateElement, out int sampleRate))
+			file.SampleRate = sampleRate;
+
+		if (TryGetFormatProperty(out JsonElement channelElement, "channels") && TryGetInt32(channelElement, out int channels))
+			file.Channels = channels;
 
 		foreach (JsonProperty tag in tags.EnumerateObject())
 		{
@@ -108,6 +122,59 @@ internal static class AudioMetadataExtractor
 	#endregion
 
 	#region Helpers
+	private static bool TryGetDouble(JsonElement element, out double value)
+	{
+		if (element.ValueKind is JsonValueKind.Number && element.TryGetDouble(out value))
+			return true;
+
+		if (element.ValueKind is JsonValueKind.String)
+		{
+			string? text = element.GetString();
+			if (double.TryParse(text, out value))
+				return true;
+		}
+
+		value = default;
+		return false;
+	}
+	private static bool TryGetInt32(JsonElement element, out int value)
+	{
+		if (element.ValueKind is JsonValueKind.Number && element.TryGetInt32(out value))
+			return true;
+
+		if (element.ValueKind is JsonValueKind.String)
+		{
+			string? text = element.GetString();
+			if (int.TryParse(text, out value))
+				return true;
+		}
+
+		value = default;
+		return false;
+	}
+	private static bool TryGetFormatProperty(JsonElement audio, JsonElement format, out JsonElement element, params ReadOnlySpan<string> names)
+	{
+		foreach (string name in names)
+		{
+			if (audio.TryGetProperty(name, out element))
+				return true;
+
+			if (audio.TryGetProperty(name.Replace("_", ""), out element))
+				return true;
+		}
+
+		foreach (string name in names)
+		{
+			if (format.TryGetProperty(name, out element))
+				return true;
+
+			if (format.TryGetProperty(name.Replace("_", ""), out element))
+				return true;
+		}
+
+		element = default;
+		return false;
+	}
 	private static JsonElement FindFormat(JsonElement root) => root.GetProperty("format");
 	private static JsonElement FindAudioStream(JsonElement root)
 	{

@@ -53,6 +53,15 @@ public sealed class MutableAudioFile : MutableDataModelBase<MutableAudioFile, Au
 
 	/// <inheritdoc cref="IAudioFileInfo.AudioFormat"/>
 	public string? AudioFormat { get; set; }
+
+	/// <inheritdoc cref="IAudioFileInfo.BitRate"/>
+	public int? BitRate { get; set; }
+
+	/// <inheritdoc cref="IAudioFileInfo.SampleRate"/>
+	public int? SampleRate { get; set; }
+
+	/// <inheritdoc cref="IAudioFileInfo.Channels"/>
+	public int? Channels { get; set; }
 	#endregion
 
 	#region Builder methods
@@ -232,6 +241,9 @@ public sealed class MutableAudioFile : MutableDataModelBase<MutableAudioFile, Au
 			TotalTracks = Update.Nullable(oldState.TotalTracks, TotalTracks),
 			ContainerFormat = Update.Nullable(oldState.ContainerFormat, ContainerFormat),
 			AudioFormat = Update.Nullable(oldState.AudioFormat, AudioFormat),
+			BitRate = Update.Nullable(oldState.BitRate, BitRate),
+			SampleRate = Update.Nullable(oldState.SampleRate, SampleRate),
+			Channels = Update.Nullable(oldState.Channels, Channels),
 		};
 	}
 	#endregion
