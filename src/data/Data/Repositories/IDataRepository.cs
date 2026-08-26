@@ -1,4 +1,4 @@
-namespace OwlShed.Hushit.Data;
+namespace OwlShed.Hushit.Data.Repositories;
 
 /// <summary>
 /// 	Represents a data model repository.

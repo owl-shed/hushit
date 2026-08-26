@@ -1,6 +1,9 @@
 global using System.Collections.ObjectModel;
 global using System.IO;
 
+global using System.Text.Json;
+global using System.Text.Json.Serialization;
+
 global using CommunityToolkit.Diagnostics;
 
 global using OwlShed.Hushit.Common;
@@ -16,3 +19,4 @@ global using OwlShed.Hushit.Data.Models;
 global using OwlShed.Hushit.Data.Tracks;
 global using OwlShed.Hushit.Data.Tracks.References;
 global using OwlShed.Hushit.Data.Updates;
+global using OwlShed.Hushit.Data.Repositories;

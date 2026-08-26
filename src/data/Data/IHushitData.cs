@@ -22,3 +22,34 @@ public interface IHushitData
 	IGenreRepository Genres { get; }
 	#endregion
 }
+
+/// <inheritdoc cref="IHushitData"/>
+public sealed class HushitData : IHushitData
+{
+	#region Properties
+	/// <inheritdoc/>
+	public IAudioFileRepository AudioFiles { get; }
+
+	/// <inheritdoc/>
+	public IArtistRepository Artists => throw new NotImplementedException();
+
+	/// <inheritdoc/>
+	public IAlbumRepository Albums => throw new NotImplementedException();
+
+	/// <inheritdoc/>
+	public ITrackRepository Tracks => throw new NotImplementedException();
+
+	/// <inheritdoc/>
+	public IGenreRepository Genres => throw new NotImplementedException();
+	#endregion
+
+	#region Constructors
+	/// <summary>Creates a new <see cref="HushitData"/> instance.</summary>
+	/// <param name="directory">The base directory to store the Hushit data in.</param>
+	public HushitData(string directory)
+	{
+		string audioFileDirectory = Path.Combine(directory, "audio_files");
+		AudioFiles = new AudioFileRepository(this, audioFileDirectory);
+	}
+	#endregion
+}
