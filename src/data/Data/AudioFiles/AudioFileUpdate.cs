@@ -38,5 +38,20 @@ public sealed class AudioFileUpdate
 
 	/// <inheritdoc cref="IAudioFileInfo.AlbumGenres"/>
 	public ListUpdate<string> AlbumGenres { get; set; } = new();
+
+	/// <inheritdoc cref="IAudioFileInfo.Duration"/>
+	public NullableUpdate<TimeSpan?> Duration { get; set; }
+
+	/// <inheritdoc cref="IAudioFileInfo.TrackNumber"/>
+	public NullableUpdate<int?> TrackNumber { get; set; }
+
+	/// <inheritdoc cref="IAudioFileInfo.TotalTracks"/>
+	public NullableUpdate<int?> TotalTracks { get; set; }
+
+	/// <inheritdoc cref="IAudioFileInfo.ContainerFormat"/>
+	public NullableUpdate<string> ContainerFormat { get; set; }
+
+	/// <inheritdoc cref="IAudioFileInfo.AudioFormat"/>
+	public NullableUpdate<string> AudioFormat { get; set; }
 	#endregion
 }

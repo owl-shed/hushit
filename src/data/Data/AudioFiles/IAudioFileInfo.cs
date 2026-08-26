@@ -39,6 +39,24 @@ public interface IAudioFileInfo : IDataModel<MutableAudioFile, AudioFileUpdate>
 
 	/// <summary>The names of the genres that the album belongs to.</summary>
 	ReadOnlyObservableCollection<string> AlbumGenres { get; }
+
+	/// <summary>The duration of the audio file.</summary>
+	TimeSpan? Duration { get; }
+
+	/// <summary>The track number of the audio file.</summary>
+	int? TrackNumber { get; }
+
+	/// <summary>The total amount of tracks.</summary>
+	int? TotalTracks { get; }
+
+	/// <summary>The format of the container.</summary>
+	string? ContainerFormat { get; }
+
+	/// <summary>The format of the audio data.</summary>
+	string? AudioFormat { get; }
+
+	/// <summary>The format string to display.</summary>
+	string? DisplayFormat { get; }
 	#endregion
 
 	#region Methods

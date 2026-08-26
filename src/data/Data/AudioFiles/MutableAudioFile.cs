@@ -38,6 +38,21 @@ public sealed class MutableAudioFile : MutableDataModelBase<MutableAudioFile, Au
 
 	/// <inheritdoc cref="IAudioFileInfo.AlbumGenres"/>
 	public IList<string> AlbumGenres { get; set; } = [];
+
+	/// <inheritdoc cref="IAudioFileInfo.Duration"/>
+	public TimeSpan? Duration { get; set; }
+
+	/// <inheritdoc cref="IAudioFileInfo.TrackNumber"/>
+	public int? TrackNumber { get; set; }
+
+	/// <inheritdoc cref="IAudioFileInfo.TotalTracks"/>
+	public int? TotalTracks { get; set; }
+
+	/// <inheritdoc cref="IAudioFileInfo.ContainerFormat"/>
+	public string? ContainerFormat { get; set; }
+
+	/// <inheritdoc cref="IAudioFileInfo.AudioFormat"/>
+	public string? AudioFormat { get; set; }
 	#endregion
 
 	#region Builder methods
@@ -212,6 +227,11 @@ public sealed class MutableAudioFile : MutableDataModelBase<MutableAudioFile, Au
 			AlbumArtists = Update.List(oldState.AlbumArtists, AlbumArtists),
 			TrackGenres = Update.List(oldState.TrackGenres, TrackGenres),
 			AlbumGenres = Update.List(oldState.AlbumGenres, AlbumGenres),
+			Duration = Update.Nullable(oldState.Duration, Duration),
+			TrackNumber = Update.Nullable(oldState.TrackNumber, TrackNumber),
+			TotalTracks = Update.Nullable(oldState.TotalTracks, TotalTracks),
+			ContainerFormat = Update.Nullable(oldState.ContainerFormat, ContainerFormat),
+			AudioFormat = Update.Nullable(oldState.AudioFormat, AudioFormat),
 		};
 	}
 	#endregion

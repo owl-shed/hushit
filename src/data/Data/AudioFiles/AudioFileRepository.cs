@@ -42,6 +42,21 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 
 		[JsonPropertyName("album_genres")]
 		public required string[] AlbumGenres { get; init; }
+
+		[JsonPropertyName("duration")]
+		public required double? Duration { get; init; }
+
+		[JsonPropertyName("track_number")]
+		public required int? TrackNumber { get; init; }
+
+		[JsonPropertyName("total_tracks")]
+		public required int? TotalTracks { get; init; }
+
+		[JsonPropertyName("container_format")]
+		public required string? ContainerFormat { get; init; }
+
+		[JsonPropertyName("audio_format")]
+		public required string? AudioFormat { get; init; }
 		#endregion
 	}
 	#endregion
@@ -132,6 +147,11 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 			AlbumArtists = mutable.AlbumArtists.ToArray(),
 			TrackGenres = mutable.TrackGenres.ToArray(),
 			AlbumGenres = mutable.AlbumGenres.ToArray(),
+			Duration = mutable.Duration?.TotalSeconds,
+			TrackNumber = mutable.TrackNumber,
+			TotalTracks = mutable.TotalTracks,
+			ContainerFormat = mutable.ContainerFormat,
+			AudioFormat = mutable.AudioFormat,
 		};
 
 	}
@@ -149,7 +169,12 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 			TrackArtists = json.TrackArtists,
 			AlbumArtists = json.AlbumArtists,
 			TrackGenres = json.TrackGenres,
-			AlbumGenres = json.AlbumGenres
+			AlbumGenres = json.AlbumGenres,
+			Duration = json.Duration is null ? null : TimeSpan.FromSeconds(json.Duration.Value),
+			TrackNumber = json.TrackNumber,
+			TotalTracks = json.TotalTracks,
+			ContainerFormat = json.ContainerFormat,
+			AudioFormat = json.AudioFormat,
 		};
 	}
 	#endregion

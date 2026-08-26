@@ -43,6 +43,55 @@ internal sealed class AudioFileInfo : DataModelBase<IAudioFileInfo, MutableAudio
 
 	/// <inheritdoc/>
 	protected override IDataRepository<IAudioFileInfo, MutableAudioFile, AudioFileUpdate> Repository => Data.AudioFiles;
+
+	/// <inheritdoc/>
+	public TimeSpan? Duration { get => Read(ref field); private set => TrySet(ref field, value); }
+
+	/// <inheritdoc/>
+	public int? TrackNumber { get => Read(ref field); private set => TrySet(ref field, value); }
+
+	/// <inheritdoc/>
+	public int? TotalTracks { get => Read(ref field); private set => TrySet(ref field, value); }
+
+	/// <inheritdoc/>
+	public string? ContainerFormat
+	{
+		get => Read(ref field);
+		private set
+		{
+			if (TrySet(ref field, value))
+				RaisePropertyChanged(nameof(DisplayFormat));
+		}
+	}
+
+	/// <inheritdoc/>
+	public string? AudioFormat
+	{
+		get => Read(ref field);
+		private set
+		{
+			if (TrySet(ref field, value))
+				RaisePropertyChanged(nameof(DisplayFormat));
+		}
+	}
+
+	/// <inheritdoc/>
+	public string? DisplayFormat
+	{
+		get
+		{
+			if (ContainerFormat is null)
+				return AudioFormat;
+
+			if (AudioFormat is null)
+				return ContainerFormat;
+
+			if (string.Equals(ContainerFormat, AudioFormat, StringComparison.OrdinalIgnoreCase))
+				return ContainerFormat;
+
+			return $"{ContainerFormat}/{AudioFormat}";
+		}
+	}
 	#endregion
 
 	#region Constructors
@@ -101,7 +150,12 @@ internal sealed class AudioFileInfo : DataModelBase<IAudioFileInfo, MutableAudio
 			TrackArtists = [.. _trackArtists],
 			AlbumArtists = [.. _albumArtists],
 			TrackGenres = [.. _trackGenres],
-			AlbumGenres = [.. _albumGenres]
+			AlbumGenres = [.. _albumGenres],
+			Duration = Duration,
+			TrackNumber = TrackNumber,
+			TotalTracks = TotalTracks,
+			ContainerFormat = ContainerFormat,
+			AudioFormat = AudioFormat,
 		};
 	}
 	internal override void CopyState(MutableAudioFile state)
@@ -129,6 +183,12 @@ internal sealed class AudioFileInfo : DataModelBase<IAudioFileInfo, MutableAudio
 		_albumArtists.Replace(state.AlbumArtists);
 		_trackGenres.Replace(state.TrackGenres);
 		_albumGenres.Replace(state.AlbumGenres);
+
+		Duration = state.Duration;
+		TrackNumber = state.TrackNumber;
+		TotalTracks = state.TotalTracks;
+		ContainerFormat = state.ContainerFormat;
+		AudioFormat = state.AudioFormat;
 	}
 	#endregion
 }
