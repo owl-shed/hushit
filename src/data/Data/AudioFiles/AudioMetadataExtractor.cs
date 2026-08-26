@@ -58,70 +58,63 @@ internal static class AudioMetadataExtractor
 
 		foreach (JsonProperty tag in tags.EnumerateObject())
 		{
-			string tagName = tag.Name.ToLower();
-			string? value = tag.Value.GetString() ?? tag.Value.ToString();
+			string value = (tag.Value.ValueKind is JsonValueKind.String ? tag.Value.GetString() : null) ?? tag.Value.ToString();
 
-			if (value.IsWhiteSpace())
-				continue;
-
-			if (tagName is "title")
-			{
-				file.WithTrackName(value);
-				continue;
-			}
-
-			if (tagName is "album")
-			{
+			if (IsTagName(tag, "title"))
+				file.WithTrack(value);
+			else if (IsTagName(tag, "album"))
 				file.WithAlbumName(value);
-				continue;
-			}
-
-			if (tagName is "artist" or "artists")
-			{
-				if (file.TrackArtists.Contains(value) is false)
-					file.TrackArtists.Add(value);
-
-				continue;
-			}
-
-			if (tagName is "albumartist" or "album_artist" or "albumartists" or "album_artists")
-			{
-				if (file.AlbumArtists.Contains(value) is false)
-					file.AlbumArtists.Add(value);
-
-				continue;
-			}
-
-			if (tagName is "date")
+			else if (IsTagName(tag, "artist", "artists", "track_artist", "track_artists"))
+				TryAddUnique(file.TrackArtists, value);
+			else if (IsTagName(tag, "album_artist", "album_artists"))
+				TryAddUnique(file.AlbumArtists, value);
+			else if (IsTagName(tag, "genre", "genres", "track_genre", "track_genres"))
+				TryAddUnique(file.TrackGenres, value);
+			else if (IsTagName(tag, "album_genre", "album_genres"))
+				TryAddUnique(file.AlbumGenres, value);
+			else if (IsTagName(tag, "date"))
 			{
 				if (DateOnly.TryParse(value, out DateOnly date))
 					file.WithTrackDate(new(date.Year, date.Month, date.Day));
-				else if (int.TryParse(value, out int year))
+				else if (TryGetInt32(tag.Value, out int year))
 					file.WithTrackDate(new(year, null, null));
-
-				continue;
 			}
-
-			if (tagName is "track")
+			else if (IsTagName(tag, "track"))
 			{
-				if (int.TryParse(value, out int track))
+				if (TryGetInt32(tag.Value, out int track))
 					file.TrackNumber = track;
-
-				continue;
 			}
-
-			if (tagName is "tracktotal" or "track_total" or "total_tracks" or "totaltracks")
+			else if (IsTagName(tag, "track_total", "total_track", "total_tracks"))
 			{
-				if (int.TryParse(value, out int totalTracks))
+				if (TryGetInt32(tag.Value, out int totalTracks))
 					file.TotalTracks = totalTracks;
-
-				continue;
 			}
 		}
 	}
 	#endregion
 
 	#region Helpers
+	private static void TryAddUnique(IList<string> list, string? value)
+	{
+		if (value is null)
+			return;
+
+		if (list.Contains(value) is false)
+			list.Add(value);
+	}
+	private static bool IsTagName(JsonProperty property, params ReadOnlySpan<string> names)
+	{
+		foreach (string name in names)
+		{
+			if (string.Equals(property.Name, name, StringComparison.OrdinalIgnoreCase))
+				return true;
+
+			if (string.Equals(property.Name.Replace("_", ""), name, StringComparison.OrdinalIgnoreCase))
+				return true;
+		}
+
+		return false;
+	}
 	private static bool TryGetDouble(JsonElement element, out double value)
 	{
 		if (element.ValueKind is JsonValueKind.Number && element.TryGetDouble(out value))
