@@ -62,5 +62,8 @@ public sealed class AudioFileUpdate
 
 	/// <inheritdoc cref="IAudioFileInfo.Channels"/>
 	public NullableUpdate<int?> Channels { get; set; }
+
+	/// <inheritdoc cref="IAudioFileInfo.Fingerprint"/>
+	public NullableUpdate<FingerprintInfo?> Fingerprint { get; set; }
 	#endregion
 }

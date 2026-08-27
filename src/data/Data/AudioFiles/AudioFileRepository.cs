@@ -66,6 +66,9 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 
 		[JsonPropertyName("channels")]
 		public required int? Channels { get; init; }
+
+		[JsonPropertyName("fingerprint")]
+		public required string? Fingerprint { get; init; }
 		#endregion
 	}
 	#endregion
@@ -164,6 +167,7 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 			BitRate = mutable.BitRate,
 			SampleRate = mutable.SampleRate,
 			Channels = mutable.Channels,
+			Fingerprint = mutable.Fingerprint?.ToString(),
 		};
 
 	}
@@ -190,6 +194,7 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 			BitRate = json.BitRate,
 			SampleRate = json.SampleRate,
 			Channels = json.Channels,
+			Fingerprint = FingerprintInfo.TryParse(json.Fingerprint),
 		};
 	}
 	#endregion

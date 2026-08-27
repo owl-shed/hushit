@@ -66,6 +66,9 @@ public interface IAudioFileInfo : IDataModel<MutableAudioFile, AudioFileUpdate>
 
 	/// <summary>The amount of channels in the audio date.</summary>
 	int? Channels { get; }
+
+	/// <summary>The fingerprint of the audio.</summary>
+	FingerprintInfo? Fingerprint { get; }
 	#endregion
 
 	#region Methods

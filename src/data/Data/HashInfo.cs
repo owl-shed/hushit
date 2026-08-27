@@ -44,7 +44,7 @@ public readonly struct HashInfo : IParsable<HashInfo>
 	public static HashInfo Parse(string s)
 	{
 		if (TryParse(s, null, out HashInfo result) is false)
-			ThrowHelper.ThrowArgumentException(nameof(s), "Invalid date info format.");
+			ThrowHelper.ThrowArgumentException(nameof(s), "Invalid hash info format.");
 
 		return result;
 	}
@@ -53,7 +53,7 @@ public readonly struct HashInfo : IParsable<HashInfo>
 	public static HashInfo Parse(string s, IFormatProvider? provider)
 	{
 		if (TryParse(s, provider, out HashInfo result) is false)
-			ThrowHelper.ThrowArgumentException(nameof(s), "Invalid date info format.");
+			ThrowHelper.ThrowArgumentException(nameof(s), "Invalid hash info format.");
 
 		return result;
 	}

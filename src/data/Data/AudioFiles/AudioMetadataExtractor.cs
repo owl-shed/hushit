@@ -5,23 +5,21 @@ internal static class AudioMetadataExtractor
 	#region Functions
 	public static async ValueTask ExtractAsync(string path, MutableAudioFile file, CancellationToken cancellation = default)
 	{
-		ProcessStartInfo startInfo = new("ffprobe",
+		FingerprintInfo? fingerprint = await GetChromaprintAsync(path, cancellation).ConfigureAwait(false);
+
+		if (fingerprint is not null)
+			file.Fingerprint = fingerprint;
+
+		string? output = await GetOutputAsync("ffprobe",
 		[
 			"-v", "quiet", "-hide_banner",
 			"-of", "json",
 			"-show_format", "-show_streams",
 			"-i", path
-		])
-		{
-			RedirectStandardOutput = true
-		};
+		], cancellation).ConfigureAwait(false);
 
-		Process? process = Process.Start(startInfo);
-		if (process is null)
+		if (output is null)
 			return;
-
-		await process.WaitForExitAsync(cancellation).ConfigureAwait(false);
-		string output = await process.StandardOutput.ReadToEndAsync(cancellation).ConfigureAwait(false);
 
 		JsonElement json = JsonDocument.Parse(output).RootElement;
 
@@ -91,9 +89,34 @@ internal static class AudioMetadataExtractor
 			}
 		}
 	}
+	private static async ValueTask<FingerprintInfo?> GetChromaprintAsync(string path, CancellationToken cancellation = default)
+	{
+		string? output = await GetOutputAsync("fpcalc", ["-plain", path], cancellation).ConfigureAwait(false);
+		if (output is null)
+			return null;
+
+		return new("chromaprint", output);
+	}
 	#endregion
 
 	#region Helpers
+	private static async ValueTask<string?> GetOutputAsync(string path, IReadOnlyList<string> arguments, CancellationToken cancellation = default)
+	{
+		ProcessStartInfo startInfo = new(path, arguments) { RedirectStandardOutput = true };
+
+		Process? process = Process.Start(startInfo);
+		if (process is null)
+			return null;
+
+		await process.WaitForExitAsync(cancellation).ConfigureAwait(false);
+		string output = await process.StandardOutput.ReadToEndAsync(cancellation).ConfigureAwait(false);
+		output = output.Trim();
+
+		if (output.IsWhiteSpace())
+			return null;
+
+		return output;
+	}
 	private static void TryAddUnique(IList<string> list, string? value)
 	{
 		if (value is null)

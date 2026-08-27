@@ -101,6 +101,9 @@ internal sealed class AudioFileInfo : DataModelBase<IAudioFileInfo, MutableAudio
 
 	/// <inheritdoc/>
 	public int? Channels { get => Read(ref field); private set => TrySet(ref field, value); }
+
+	/// <inheritdoc/>
+	public FingerprintInfo? Fingerprint { get => Read(ref field); private set => TrySet(ref field, value); }
 	#endregion
 
 	#region Constructors
@@ -168,6 +171,7 @@ internal sealed class AudioFileInfo : DataModelBase<IAudioFileInfo, MutableAudio
 			BitRate = BitRate,
 			SampleRate = SampleRate,
 			Channels = Channels,
+			Fingerprint = Fingerprint,
 		};
 	}
 	internal override void CopyState(MutableAudioFile state)
@@ -204,6 +208,7 @@ internal sealed class AudioFileInfo : DataModelBase<IAudioFileInfo, MutableAudio
 		BitRate = state.BitRate;
 		SampleRate = state.SampleRate;
 		Channels = state.Channels;
+		Fingerprint = state.Fingerprint;
 	}
 	#endregion
 }
