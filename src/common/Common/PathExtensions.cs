@@ -22,6 +22,22 @@ public static class PathExtensions
 			string relative = Path.GetRelativePath(possibleBase, path);
 			return relative != path;
 		}
+
+		/// <summary>Gets the normalised version of the given <paramref name="path"/>.</summary>
+		/// <param name="path">The path to get the normalised version of.</param>
+		/// <returns></returns>
+		[return: NotNullIfNotNull(nameof(path))]
+		public static string? GetNormalised(string? path)
+		{
+			if (path is null)
+				return null;
+
+			path = Path.GetFullPath(path);
+
+			// Todo(Nightowl): This is definitely missing some rules;
+
+			return path;
+		}
 		#endregion
 	}
 }

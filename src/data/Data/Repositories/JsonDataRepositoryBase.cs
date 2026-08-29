@@ -8,15 +8,20 @@ internal abstract class JsonDataRepositoryBase<TModel, TMutable, TUpdate, TTyped
 	where TJson : notnull
 {
 	#region Constants
-	private const string FileName = "data.json";
+	protected const string DataFileName = "data.json";
+	protected const string IndexDirectoryName = "indices";
 	#endregion
 
 	#region Properties
 	protected abstract JsonTypeInfo<TJson> TypeInfo { get; }
+	protected string IndexDirectory { get; }
 	#endregion
 
 	#region Constructors
-	protected JsonDataRepositoryBase(IHushitData data, string baseDirectory) : base(data, baseDirectory) { }
+	protected JsonDataRepositoryBase(IHushitData data, string baseDirectory) : base(data, baseDirectory)
+	{
+		IndexDirectory = Path.Combine(BaseDirectory, IndexDirectoryName);
+	}
 	#endregion
 
 	#region Persist methods
@@ -27,7 +32,7 @@ internal abstract class JsonDataRepositoryBase<TModel, TMutable, TUpdate, TTyped
 		TJson json = ToJson(model.ToMutable());
 
 		string path = GetJsonPath(directory);
-		using (FileStream file = File.Open(path, FileMode.Create, FileAccess.Write, FileShare.None))
+		using (FileStream file = File.Create(path))
 			await JsonSerializer.SerializeAsync(file, json, TypeInfo, cancellation).ConfigureAwait(false);
 	}
 	protected override async ValueTask<TTypedModel?> TryLoadPersistedAsync(string id, string directory, CancellationToken cancellation = default)
@@ -65,6 +70,6 @@ internal abstract class JsonDataRepositoryBase<TModel, TMutable, TUpdate, TTyped
 	#endregion
 
 	#region Helpers
-	private static string GetJsonPath(string directory) => Path.Combine(directory, FileName);
+	private static string GetJsonPath(string directory) => Path.Combine(directory, DataFileName);
 	#endregion
 }

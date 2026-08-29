@@ -44,10 +44,16 @@ internal abstract class DataRepositoryBase<TModel, TMutable, TUpdate, TTypedMode
 	{
 		cancellation.ThrowIfCancellationRequested();
 
+		string id = CreateNewId();
+		return await CreateAsync(id, callback, cancellation).ConfigureAwait(false);
+	}
+	protected async ValueTask<TModel> CreateAsync(string id, Func<TMutable, CancellationToken, ValueTask> callback, CancellationToken cancellation = default)
+	{
+		cancellation.ThrowIfCancellationRequested();
+
 		TMutable mutable = new();
 		await callback.Invoke(mutable, cancellation).ConfigureAwait(false);
 
-		string id = CreateNewId();
 		TTypedModel model = Create(id, mutable);
 		Cache(model);
 
@@ -64,11 +70,17 @@ internal abstract class DataRepositoryBase<TModel, TMutable, TUpdate, TTypedMode
 	{
 		cancellation.ThrowIfCancellationRequested();
 
+		string id = CreateNewId();
+		return await CreateAsync(id, callback, cancellation).ConfigureAwait(false);
+	}
+	protected async ValueTask<TModel> CreateAsync(string id, Action<TMutable> callback, CancellationToken cancellation = default)
+	{
+		cancellation.ThrowIfCancellationRequested();
+
 		TMutable mutable = new();
 		callback.Invoke(mutable);
 		cancellation.ThrowIfCancellationRequested();
 
-		string id = CreateNewId();
 		TTypedModel model = Create(id, mutable);
 		Cache(model);
 

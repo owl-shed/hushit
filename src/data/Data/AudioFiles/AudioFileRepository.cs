@@ -79,18 +79,36 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 
 	#region Properties
 	protected override JsonTypeInfo<JsonModel> TypeInfo => JsonContext.Default.JsonModel;
+	private JsonDataIndex<string> PathIndex { get; }
 	#endregion
 
 	#region Constructors
 	public AudioFileRepository(IHushitData data, string baseDirectory) : base(data, baseDirectory)
 	{
+		PathIndex = new(IndexDirectory, "by_path");
 	}
 	#endregion
 
 	#region Persist methods
 	public async ValueTask<IAudioFileInfo> CreateAsync(string path, CancellationToken cancellation = default)
 	{
-		return await CreateAsync(async (mutable, cancellation) =>
+		path = Path.GetNormalised(path);
+
+		string id = CreateNewId();
+		string pathId = await PathIndex.GetOrAddAsync(path, id, cancellation).ConfigureAwait(false);
+
+		IAudioFileInfo? file = null;
+		if (pathId != id)
+		{
+			file = await TryGetAsync(pathId, cancellation).ConfigureAwait(false);
+			if (file is not null)
+			{
+				await TryReloadAsync(file, cancellation).ConfigureAwait(false);
+				return file;
+			}
+		}
+
+		file = await CreateAsync(id, async (mutable, cancellation) =>
 		{
 			HashInfo hash = await GetHashAsync(path, PreferredHash, cancellation).ConfigureAwait(false);
 			string trackName = Path.GetFileNameWithoutExtension(path);
@@ -103,6 +121,8 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 			await AudioMetadataExtractor.ExtractAsync(path, mutable, cancellation).ConfigureAwait(false);
 
 		}, cancellation).ConfigureAwait(false);
+
+		return file;
 	}
 	public async ValueTask<bool> TryReloadAsync(IAudioFileInfo file, CancellationToken cancellation = default)
 	{
@@ -136,6 +156,12 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 			mutable.Hash = newHash;
 			await AudioMetadataExtractor.ExtractAsync(file.Path, mutable, cancellation).ConfigureAwait(false);
 		});
+	}
+	protected override async ValueTask OnRemovedAsync(AudioFileInfo model, CancellationToken cancellation = default)
+	{
+		await base.OnRemovedAsync(model, cancellation);
+
+		await PathIndex.RemoveAsync(model.Id, cancellation).ConfigureAwait(false);
 	}
 	#endregion
 
