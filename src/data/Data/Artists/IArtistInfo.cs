@@ -12,4 +12,13 @@ public interface IArtistInfo : IDataModel<MutableArtist, ArtistUpdate>, IAlbumRe
 	/// <summary>Any aliases that the artist may have.</summary>
 	ReadOnlyObservableCollection<string> Aliases { get; }
 	#endregion
+
+	#region Mutable methods
+	/// <inheritdoc cref="IDataModel{T}.ToMutable"/>
+	new MutableArtist ToMutable();
+	MutableArtist IDataModel<MutableArtist>.ToMutable() => ToMutable();
+	IMutableAlbumReferences IDataModel<IMutableAlbumReferences>.ToMutable() => ToMutable();
+	IMutableGenreReferences IDataModel<IMutableGenreReferences>.ToMutable() => ToMutable();
+	IMutableTrackReferences IDataModel<IMutableTrackReferences>.ToMutable() => ToMutable();
+	#endregion
 }

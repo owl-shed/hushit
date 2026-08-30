@@ -3,7 +3,7 @@ namespace OwlShed.Hushit.Data.Tracks.References;
 /// <summary>
 /// 	Represents a data model that contains references to tracks.
 /// </summary>
-public interface ITrackReferencesInfo : IDataModel<ITrackReferencesUpdate>
+public interface ITrackReferencesInfo : IDataModel<IMutableTrackReferences, ITrackReferencesUpdate>
 {
 	#region Properties
 	/// <summary>The ids of the related tracks.</summary>

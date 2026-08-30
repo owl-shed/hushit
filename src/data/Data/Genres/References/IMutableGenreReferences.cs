@@ -3,7 +3,7 @@ namespace OwlShed.Hushit.Data.Genres.References;
 /// <summary>
 /// 	Represents a mutable version of the <see cref="IGenreReferencesInfo"/>.
 /// </summary>
-public interface IMutableGenreReferences
+public interface IMutableGenreReferences : IMutableDataModel<IMutableGenreReferences, IGenreReferencesUpdate>
 {
 	#region Properties
 	/// <inheritdoc cref="IGenreReferencesInfo.GenreIds"/>

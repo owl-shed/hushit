@@ -19,6 +19,14 @@ public interface ITrackInfo : IDataModel<MutableTrack, TrackUpdate>, IArtistRefe
 	string? AudioFileId { get; }
 	#endregion
 
+	#region Mutable methods
+	/// <inheritdoc cref="IDataModel{T}.ToMutable"/>
+	new MutableTrack ToMutable();
+	MutableTrack IDataModel<MutableTrack>.ToMutable() => ToMutable();
+	IMutableArtistReferences IDataModel<IMutableArtistReferences>.ToMutable() => ToMutable();
+	IMutableGenreReferences IDataModel<IMutableGenreReferences>.ToMutable() => ToMutable();
+	#endregion
+
 	#region Methods
 	/// <summary>Gets the album that the track belongs to.</summary>
 	/// <param name="cancellation">A cancellation token that can be used to cancel the operation.</param>

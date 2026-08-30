@@ -27,7 +27,7 @@ public interface IDataModel : INotifyPropertyChanged
 /// </summary>
 /// <typeparam name="TMutable">The type that represents the mutable version of the model.</typeparam>
 public interface IDataModel<out TMutable> : IDataModel
-	where TMutable : notnull
+	where TMutable : notnull, IMutableDataModel<TMutable>
 {
 	#region Methods
 	/// <summary>Updates the data model.</summary>
