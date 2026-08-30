@@ -3,6 +3,62 @@ namespace OwlShed.Hushit.Data.AudioFiles;
 internal static class AudioMetadataExtractor
 {
 	#region Functions
+	public static async ValueTask<string?> ExtractCoverAsync(string path, CancellationToken cancellation = default)
+	{
+		JsonElement? metadata = await GetMetadataAsync(path, cancellation);
+		if (metadata is null)
+			return null;
+
+		if (TryGetCover(metadata.Value, out int stream, out string? format) is false)
+			return null;
+
+		string extension = format switch
+		{
+			"png" => ".png",
+			"mjpeg" => ".jpg",
+			_ => ".png",
+		};
+
+		DirectoryInfo directory = Directory.CreateTempSubdirectory("owlshed.hushit.covers.");
+		string outputPath = Path.Combine(directory.FullName, "cover" + extension);
+
+		_ = await GetOutputAsync("ffmpeg",
+		[
+			"-i", path,
+			"-map", $"0:{stream}",
+			"-frames:v", "1",
+			"-c", "copy",
+			outputPath
+		]);
+
+		if (File.Exists(outputPath))
+			return outputPath;
+
+		return null;
+	}
+	private static bool TryGetCover(JsonElement root, out int stream, out string? format)
+	{
+		stream = -1;
+		int lastVideo = -1;
+
+		foreach (JsonElement streamElement in root.GetProperty("streams").EnumerateArray())
+		{
+			stream++;
+			if (streamElement.TryGetProperty("codec_type", out JsonElement codec) && codec.GetString() == "video_codec")
+			{
+				lastVideo = stream;
+
+				format = streamElement.GetProperty("codec_name").GetString();
+				if (format is "mpjeg" or "png")
+					return true;
+			}
+		}
+
+		format = default;
+		stream = lastVideo;
+		return lastVideo >= 0;
+	}
+
 	public static async ValueTask ExtractAsync(string path, MutableAudioFile file, CancellationToken cancellation = default)
 	{
 		FingerprintInfo? fingerprint = await GetChromaprintAsync(path, cancellation).ConfigureAwait(false);
@@ -10,22 +66,13 @@ internal static class AudioMetadataExtractor
 		if (fingerprint is not null)
 			file.Fingerprint = fingerprint;
 
-		string? output = await GetOutputAsync("ffprobe",
-		[
-			"-v", "quiet", "-hide_banner",
-			"-of", "json",
-			"-show_format", "-show_streams",
-			"-i", path
-		], cancellation).ConfigureAwait(false);
-
-		if (output is null)
+		JsonElement? json = await GetMetadataAsync(path, cancellation).ConfigureAwait(false);
+		if (json is null)
 			return;
 
-		JsonElement json = JsonDocument.Parse(output).RootElement;
-
-		JsonElement format = FindFormat(json);
-		JsonElement audio = FindAudioStream(json);
-		JsonElement tags = FindTags(json);
+		JsonElement format = FindFormat(json.Value);
+		JsonElement audio = FindAudioStream(json.Value);
+		JsonElement tags = FindTags(json.Value);
 
 		ExtractMetadata(format, audio, tags, file);
 	}
@@ -100,9 +147,29 @@ internal static class AudioMetadataExtractor
 	#endregion
 
 	#region Helpers
+	private static async ValueTask<JsonElement?> GetMetadataAsync(string path, CancellationToken cancellation = default)
+	{
+		string? output = await GetOutputAsync("ffprobe",
+				[
+					"-v", "quiet", "-hide_banner",
+			"-of", "json",
+			"-show_format", "-show_streams",
+			"-i", path
+				], cancellation).ConfigureAwait(false);
+
+		if (output is null)
+			return null;
+
+		JsonElement json = JsonDocument.Parse(output).RootElement;
+		return json;
+	}
 	private static async ValueTask<string?> GetOutputAsync(string path, IReadOnlyList<string> arguments, CancellationToken cancellation = default)
 	{
-		ProcessStartInfo startInfo = new(path, arguments) { RedirectStandardOutput = true };
+		ProcessStartInfo startInfo = new(path, arguments)
+		{
+			RedirectStandardOutput = true,
+			RedirectStandardError = true,
+		};
 
 		Process? process = Process.Start(startInfo);
 		if (process is null)

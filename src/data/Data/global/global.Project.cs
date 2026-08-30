@@ -20,3 +20,4 @@ global using OwlShed.Hushit.Data.Tracks;
 global using OwlShed.Hushit.Data.Tracks.References;
 global using OwlShed.Hushit.Data.Updates;
 global using OwlShed.Hushit.Data.Indices;
+global using OwlShed.Hushit.Data.Images;

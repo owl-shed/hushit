@@ -40,6 +40,9 @@ internal abstract class JsonDataRepositoryBase<TModel, TMutable, TUpdate, TTyped
 		cancellation.ThrowIfCancellationRequested();
 
 		string path = GetJsonPath(directory);
+		if (File.Exists(path) is false)
+			return null;
+
 		TJson? json;
 		using (FileStream file = File.OpenRead(path))
 			json = await JsonSerializer.DeserializeAsync(file, TypeInfo, cancellation).ConfigureAwait(false);

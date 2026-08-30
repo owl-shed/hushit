@@ -20,6 +20,9 @@ public interface IHushitData
 
 	/// <summary>The data repository for genre information.</summary>
 	IGenreRepository Genres { get; }
+
+	/// <summary>The data repository for image file information.</summary>
+	IImageRepository Images { get; }
 	#endregion
 }
 
@@ -41,6 +44,9 @@ public sealed class HushitData : IHushitData
 
 	/// <inheritdoc/>
 	public IGenreRepository Genres => throw new NotImplementedException();
+
+	/// <inheritdoc/>
+	public IImageRepository Images { get; }
 	#endregion
 
 	#region Constructors
@@ -50,6 +56,9 @@ public sealed class HushitData : IHushitData
 	{
 		string audioFileDirectory = Path.Combine(directory, "audio_files");
 		AudioFiles = new AudioFileRepository(this, audioFileDirectory);
+
+		string imageDirectory = Path.Combine(directory, "images");
+		Images = new ImageRepository(this, imageDirectory);
 	}
 	#endregion
 }

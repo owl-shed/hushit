@@ -1,13 +1,13 @@
 namespace OwlShed.Hushit.Data.AudioFiles;
 
-internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudioFileInfo, MutableAudioFile, AudioFileUpdate, AudioFileInfo, AudioFileRepository.JsonModel>, IAudioFileRepository
+internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudioFileInfo, MutableAudioFile, AudioFileUpdate, AudioFileInfo, AudioFileRepository.AudioFileJson>, IAudioFileRepository
 {
 	#region Nested types
 	[JsonSourceGenerationOptions(WriteIndented = true, PropertyNamingPolicy = JsonKnownNamingPolicy.SnakeCaseLower)]
-	[JsonSerializable(typeof(JsonModel))]
+	[JsonSerializable(typeof(AudioFileJson))]
 	[JsonSerializable(typeof(string[]))]
-	private sealed partial class JsonContext : JsonSerializerContext { }
-	internal sealed class JsonModel
+	private sealed partial class AudioFileJsonContext : JsonSerializerContext { }
+	internal sealed class AudioFileJson
 	{
 		#region Properties
 		[JsonPropertyName("path")]
@@ -78,7 +78,7 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 	#endregion
 
 	#region Properties
-	protected override JsonTypeInfo<JsonModel> TypeInfo => JsonContext.Default.JsonModel;
+	protected override JsonTypeInfo<AudioFileJson> TypeInfo => AudioFileJsonContext.Default.AudioFileJson;
 	private JsonDataIndex<string> PathIndex { get; }
 	#endregion
 
@@ -106,6 +106,7 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 				await TryReloadAsync(file, cancellation).ConfigureAwait(false);
 				return file;
 			}
+			await PathIndex.RemoveAsync(pathId, cancellation).ConfigureAwait(false);
 		}
 
 		file = await CreateAsync(id, async (mutable, cancellation) =>
@@ -159,14 +160,13 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 	}
 	protected override async ValueTask OnRemovedAsync(AudioFileInfo model, CancellationToken cancellation = default)
 	{
-		await base.OnRemovedAsync(model, cancellation);
-
+		await base.OnRemovedAsync(model, cancellation).ConfigureAwait(false);
 		await PathIndex.RemoveAsync(model.Id, cancellation).ConfigureAwait(false);
 	}
 	#endregion
 
 	#region Json methods
-	protected override JsonModel ToJson(MutableAudioFile mutable)
+	protected override AudioFileJson ToJson(MutableAudioFile mutable)
 	{
 		Debug.Assert(mutable.Path is not null);
 		Debug.Assert(mutable.Hash is not null);
@@ -197,7 +197,7 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 		};
 
 	}
-	protected override MutableAudioFile FromJson(JsonModel json)
+	protected override MutableAudioFile FromJson(AudioFileJson json)
 	{
 		return new()
 		{
