@@ -23,20 +23,6 @@ public sealed class MutableAlbum :
 	public IList<string> GenreIds { get; set; } = [];
 	#endregion
 
-	#region Builder methods
-	/// <summary>Sets the new name for the album.</summary>
-	/// <param name="name">The new name for the album.</param>
-	/// <returns>The used album update builder.</returns>
-	/// <exception cref="ArgumentException">Thrown if the given name was empty.</exception>
-	public MutableAlbum WithName(string name)
-	{
-		Guard.IsNullOrWhiteSpace(name);
-		Name = name;
-
-		return this;
-	}
-	#endregion
-
 	#region Update methods
 	/// <inheritdoc/>
 	public override AlbumUpdate GetUpdateFrom(MutableAlbum oldState)

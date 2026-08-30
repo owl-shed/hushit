@@ -106,9 +106,9 @@ internal static class AudioMetadataExtractor
 			string value = (tag.Value.ValueKind is JsonValueKind.String ? tag.Value.GetString() : null) ?? tag.Value.ToString();
 
 			if (IsTagName(tag, "title"))
-				file.WithTrackName(value);
+				file.TrackName = value;
 			else if (IsTagName(tag, "album"))
-				file.WithAlbumName(value);
+				file.AlbumName = value;
 			else if (IsTagName(tag, "artist", "artists", "track_artist", "track_artists"))
 				TryAddUnique(file.TrackArtists, value);
 			else if (IsTagName(tag, "album_artist", "album_artists"))
@@ -120,9 +120,9 @@ internal static class AudioMetadataExtractor
 			else if (IsTagName(tag, "date"))
 			{
 				if (DateOnly.TryParse(value, out DateOnly date))
-					file.WithTrackDate(new(date.Year, date.Month, date.Day));
+					file.TrackDate = new(date.Year, date.Month, date.Day);
 				else if (TryGetInt32(tag.Value, out int year))
-					file.WithTrackDate(new(year, null, null));
+					file.TrackDate = new(year, null, null);
 			}
 			else if (IsTagName(tag, "track"))
 			{

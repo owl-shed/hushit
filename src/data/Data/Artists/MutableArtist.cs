@@ -26,59 +26,6 @@ public sealed class MutableArtist :
 	public IList<string> AlbumIds { get; set; } = [];
 	#endregion
 
-	#region Builder methods
-	/// <summary>Sets the new name for the artist.</summary>
-	/// <param name="name">The new name for the artist.</param>
-	/// <returns>The used artist update builder.</returns>
-	/// <exception cref="ArgumentException">Thrown if the given name was empty.</exception>
-	public MutableArtist WithName(string name)
-	{
-		Guard.IsNotWhiteSpace(name);
-
-		Name = name;
-		return this;
-	}
-
-	/// <summary>Adds a new alias for the artist.</summary>
-	/// <param name="alias">The new alias.</param>
-	/// <returns>The used artist update builder.</returns>
-	/// <exception cref="ArgumentException">Thrown if the given alias was empty.</exception>
-	public MutableArtist AddAlias(string alias)
-	{
-		Guard.IsNotWhiteSpace(alias);
-
-
-		Aliases.Add(alias);
-		return this;
-	}
-
-	/// <summary>Removes an alias from the artist.</summary>
-	/// <param name="alias">The alias to remove.</param>
-	/// <returns>The used artist update builder.</returns>
-	/// <exception cref="ArgumentException">Thrown if the given alias was empty.</exception>
-	public MutableArtist RemoveAlias(string alias)
-	{
-		Guard.IsNotWhiteSpace(alias);
-
-		Aliases.Remove(alias);
-		return this;
-	}
-
-	/// <summary>Sets the new aliases for the artist.</summary>
-	/// <param name="aliases">The new aliases to set for the artist.</param>
-	/// <returns>The used artist update builder.</returns>
-	/// <remarks>This will override all of the previous aliases.</remarks>
-	/// <exception cref="ArgumentException">Thrown if any of the given aliases was empty.</exception>
-	public MutableArtist WithAliases(params IReadOnlyList<string> aliases)
-	{
-		foreach (string alias in aliases)
-			Guard.IsNotWhiteSpace(alias, nameof(aliases));
-
-		Aliases = [.. aliases];
-		return this;
-	}
-	#endregion
-
 	#region Update methods
 	/// <inheritdoc/>
 	public override ArtistUpdate GetUpdateFrom(MutableArtist oldState)

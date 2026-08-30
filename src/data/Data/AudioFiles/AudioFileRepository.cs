@@ -117,10 +117,9 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 			HashInfo hash = await GetHashAsync(path, PreferredHash, cancellation).ConfigureAwait(false);
 			string trackName = Path.GetFileNameWithoutExtension(path);
 
-			mutable
-				.WithPath(path)
-				.WithHash(hash)
-				.WithTrackName(trackName);
+			mutable.Path = path;
+			mutable.Hash = hash;
+			mutable.TrackName = trackName;
 
 			Task extractTask = AudioMetadataExtractor.ExtractAsync(path, mutable, cancellation).AsTask();
 			Task<IImageInfo?> coverTask = ExtractCoverAsync(path, cancellation).AsTask();

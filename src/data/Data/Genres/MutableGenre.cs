@@ -23,20 +23,6 @@ public sealed class MutableGenre :
 	public IList<string> TrackIds { get; set; } = [];
 	#endregion
 
-	#region Builder methods
-	/// <summary>Sets the new name for the genre.</summary>
-	/// <param name="name">The new name for the genre.</param>
-	/// <returns>The used genre update builder.</returns>
-	/// <exception cref="ArgumentException">Thrown if the given name was empty.</exception>
-	public MutableGenre WithName(string name)
-	{
-		Guard.IsNotWhiteSpace(name);
-		Name = name;
-
-		return this;
-	}
-	#endregion
-
 	#region Update methods
 	/// <inheritdoc/>
 	public override GenreUpdate GetUpdateFrom(MutableGenre oldState)

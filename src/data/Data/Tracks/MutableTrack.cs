@@ -28,60 +28,6 @@ public sealed class MutableTrack :
 	public IList<string> GenreIds { get; set; } = [];
 	#endregion
 
-	#region Builder methods
-	/// <summary>Sets the new name for the track.</summary>
-	/// <param name="name">The new name for the track.</param>
-	/// <returns>The used track update builder.</returns>
-	/// <exception cref="ArgumentException">Thrown if the given <paramref name="name"/> was empty.</exception>
-	public MutableTrack WithName(string name)
-	{
-		Guard.IsNotWhiteSpace(name);
-
-		Name = name;
-		return this;
-	}
-
-	/// <summary>Sets the new duration for the track.</summary>
-	/// <param name="duration">The new duration for the track.</param>
-	/// <returns>The used track update builder.</returns>
-	/// <exception cref="ArgumentOutOfRangeException">
-	/// 	Thrown if the given <paramref name="duration"/> was less than <see cref="TimeSpan.Zero"/>.
-	/// </exception>
-	public MutableTrack WithDuration(TimeSpan duration)
-	{
-		Guard.IsGreaterThanOrEqualTo(duration, TimeSpan.Zero);
-
-		Duration = duration;
-		return this;
-	}
-
-	/// <summary>Sets the id for the new album of the track.</summary>
-	/// <param name="id">The id for the new album of the track. A <see langword="null"/> value can be used to remove track from the album.</param>
-	/// <returns>The used track update builder.</returns>
-	/// <exception cref="ArgumentException">Thrown if the given <paramref name="id"/> was empty.</exception>
-	public MutableTrack WithAlbum(string? id)
-	{
-		if (id is not null)
-			Guard.IsNotWhiteSpace(id);
-
-		AlbumId = id;
-		return this;
-	}
-
-	/// <summary>Sets the id for the new audio file of the track.</summary>
-	/// <param name="id">The id for the new audio file of the track. A <see langword="null"/> value can be used to remove track from the audio file.</param>
-	/// <returns>The used track update builder.</returns>
-	/// <exception cref="ArgumentException">Thrown if the given <paramref name="id"/> was empty.</exception>
-	public MutableTrack WithAudioFile(string? id)
-	{
-		if (id is not null)
-			Guard.IsNotWhiteSpace(id);
-
-		AudioFileId = id;
-		return this;
-	}
-	#endregion
-
 	#region Update methods
 	/// <inheritdoc/>
 	public override TrackUpdate GetUpdateFrom(MutableTrack oldState)
@@ -103,25 +49,4 @@ public sealed class MutableTrack :
 		};
 	}
 	#endregion
-}
-
-/// <summary>
-/// 	Contains various extensions related to the <see cref="MutableTrack"/>.
-/// </summary>
-public static class MutableTrackExtensions
-{
-	extension(MutableTrack track)
-	{
-		#region Methods
-		/// <summary>Sets the new album of the track.</summary>
-		/// <param name="album">The new album of the track. A <see langword="null"/> value can be used to remove track from the album.</param>
-		/// <returns>The used track update builder.</returns>
-		public MutableTrack WithAlbum(IAlbumInfo? album) => track.WithAlbum(album?.Id);
-
-		/// <summary>Sets the new audio file of the track.</summary>
-		/// <param name="file">The new audio file of the track. A <see langword="null"/> value can be used to remove track from the audio file.</param>
-		/// <returns>The used track update builder.</returns>
-		public MutableTrack WithAudioFile(IAudioFileInfo? file) => track.WithAudioFile(file?.Id);
-		#endregion
-	}
 }
