@@ -3,7 +3,7 @@ namespace OwlShed.Hushit.Data.Tracks;
 /// <summary>
 /// 	Represents an update to the <see cref="ITrackInfo"/>.
 /// </summary>
-public sealed class TrackUpdate : IArtistReferencesUpdate, IGenreReferencesUpdate
+public sealed class TrackUpdate
 {
 	#region Properties
 	/// <inheritdoc cref="ITrackInfo.Name"/>
@@ -18,10 +18,10 @@ public sealed class TrackUpdate : IArtistReferencesUpdate, IGenreReferencesUpdat
 	/// <inheritdoc cref="ITrackInfo.AudioFileId"/>
 	public NullableUpdate<string> AudioFileId { get; set; }
 
-	/// <inheritdoc/>
+	/// <inheritdoc cref="IArtistReferencesInfo.ArtistIds"/>
 	public ListUpdate<string> ArtistIds { get; set; } = new();
 
-	/// <inheritdoc/>
+	/// <inheritdoc cref="IGenreReferencesInfo.GenreIds"/>
 	public ListUpdate<string> GenreIds { get; set; } = new();
 	#endregion
 }

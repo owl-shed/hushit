@@ -3,19 +3,19 @@ namespace OwlShed.Hushit.Data.Albums;
 /// <summary>
 /// 	Represents an update to the <see cref="IAlbumInfo"/>.
 /// </summary>
-public sealed class AlbumUpdate : IArtistReferencesUpdate, ITrackReferencesUpdate, IGenreReferencesUpdate
+public sealed class AlbumUpdate
 {
 	#region Properties
 	/// <inheritdoc cref="IAlbumInfo.Name"/>
 	public ValueUpdate<string> Name { get; set; }
 
-	/// <inheritdoc/>
+	/// <inheritdoc cref="IArtistReferencesInfo.ArtistIds"/>
 	public ListUpdate<string> ArtistIds { get; set; } = new();
 
-	/// <inheritdoc/>
+	/// <inheritdoc cref="ITrackReferencesInfo.TrackIds"/>
 	public ListUpdate<string> TrackIds { get; set; } = new();
 
-	/// <inheritdoc/>
+	/// <inheritdoc cref="IGenreReferencesInfo.GenreIds"/>
 	public ListUpdate<string> GenreIds { get; set; } = new();
 	#endregion
 }

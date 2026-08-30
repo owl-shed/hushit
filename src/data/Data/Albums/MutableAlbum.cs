@@ -3,23 +3,19 @@ namespace OwlShed.Hushit.Data.Albums;
 /// <summary>
 /// 	Represents a mutable version of the <see cref="IAlbumInfo"/>.
 /// </summary>
-public sealed class MutableAlbum :
-	MutableDataModelBase<MutableAlbum, AlbumUpdate>,
-	IMutableArtistReferences,
-	IMutableTrackReferences,
-	IMutableGenreReferences
+public sealed class MutableAlbum : MutableDataModelBase<MutableAlbum, AlbumUpdate>
 {
 	#region Properties
 	/// <inheritdoc cref="IAlbumInfo.Name"/>
 	public string? Name { get; set; }
 
-	/// <inheritdoc/>
+	/// <inheritdoc cref="IArtistReferencesInfo.ArtistIds"/>
 	public IList<string> ArtistIds { get; set; } = [];
 
-	/// <inheritdoc/>
+	/// <inheritdoc cref="ITrackReferencesInfo.TrackIds"/>
 	public IList<string> TrackIds { get; set; } = [];
 
-	/// <inheritdoc/>
+	/// <inheritdoc cref="IGenreReferencesInfo.GenreIds"/>
 	public IList<string> GenreIds { get; set; } = [];
 	#endregion
 

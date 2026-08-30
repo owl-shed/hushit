@@ -3,10 +3,7 @@ namespace OwlShed.Hushit.Data.Tracks;
 /// <summary>
 /// 	Represents a mutable version of the <see cref="ITrackInfo"/>.
 /// </summary>
-public sealed class MutableTrack :
-	MutableDataModelBase<MutableTrack, TrackUpdate>,
-	IMutableArtistReferences,
-	IMutableGenreReferences
+public sealed class MutableTrack : MutableDataModelBase<MutableTrack, TrackUpdate>
 {
 	#region Properties
 	/// <inheritdoc cref="ITrackInfo.Name"/>
@@ -21,10 +18,10 @@ public sealed class MutableTrack :
 	/// <inheritdoc cref="ITrackInfo.AudioFileId"/>
 	public string? AudioFileId { get; set; }
 
-	/// <inheritdoc/>
+	/// <inheritdoc cref="IArtistReferencesInfo.ArtistIds"/>
 	public IList<string> ArtistIds { get; set; } = [];
 
-	/// <inheritdoc/>
+	/// <inheritdoc cref="IGenreReferencesInfo.GenreIds"/>
 	public IList<string> GenreIds { get; set; } = [];
 	#endregion
 

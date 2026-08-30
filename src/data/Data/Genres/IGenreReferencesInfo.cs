@@ -1,9 +1,9 @@
-namespace OwlShed.Hushit.Data.Genres.References;
+namespace OwlShed.Hushit.Data.Genres;
 
 /// <summary>
 /// 	Represents a data model that contains references to genres.
 /// </summary>
-public interface IGenreReferencesInfo : IDataModel<IMutableGenreReferences, IGenreReferencesUpdate>
+public interface IGenreReferencesInfo
 {
 	#region Properties
 	/// <summary>The ids of the related genres.</summary>

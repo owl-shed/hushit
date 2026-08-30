@@ -9,13 +9,4 @@ public interface IGenreInfo : IDataModel<MutableGenre, GenreUpdate>, IArtistRefe
 	/// <summary>The name of the genre.</summary>
 	string Name { get; }
 	#endregion
-
-	#region Mutable methods
-	/// <inheritdoc cref="IDataModel{T}.ToMutable"/>
-	new MutableGenre ToMutable();
-	MutableGenre IDataModel<MutableGenre>.ToMutable() => ToMutable();
-	IMutableArtistReferences IDataModel<IMutableArtistReferences>.ToMutable() => ToMutable();
-	IMutableAlbumReferences IDataModel<IMutableAlbumReferences>.ToMutable() => ToMutable();
-	IMutableTrackReferences IDataModel<IMutableTrackReferences>.ToMutable() => ToMutable();
-	#endregion
 }

@@ -3,23 +3,19 @@ namespace OwlShed.Hushit.Data.Genres;
 /// <summary>
 ///   Represents a mutable version of the <see cref="IGenreInfo"/>.
 /// </summary>
-public sealed class MutableGenre :
-	MutableDataModelBase<MutableGenre, GenreUpdate>,
-	IMutableArtistReferences,
-	IMutableAlbumReferences,
-	IMutableTrackReferences
+public sealed class MutableGenre : MutableDataModelBase<MutableGenre, GenreUpdate>
 {
 	#region Properties
 	/// <inheritdoc cref="IGenreInfo.Name"/>
 	public string? Name { get; set; }
 
-	/// <inheritdoc/>
+	/// <inheritdoc cref="IArtistReferencesInfo.ArtistIds"/>
 	public IList<string> ArtistIds { get; set; } = [];
 
-	/// <inheritdoc/>
+	/// <inheritdoc cref="IAlbumReferencesInfo.AlbumIds"/>
 	public IList<string> AlbumIds { get; set; } = [];
 
-	/// <inheritdoc/>
+	/// <inheritdoc cref="ITrackReferencesInfo.TrackIds"/>
 	public IList<string> TrackIds { get; set; } = [];
 	#endregion
 

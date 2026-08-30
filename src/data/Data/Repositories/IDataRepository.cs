@@ -246,7 +246,7 @@ public static class IDataRepositoryExtensions
 
 	extension<TModel, TMutable>(IDataRepository<TModel, TMutable> repository)
 		where TModel : notnull, IDataModel<TMutable>
-		where TMutable : notnull, IMutableDataModel
+		where TMutable : notnull, IMutableDataModel<TMutable>
 	{
 		#region Methods
 		/// <summary>Updates the data model with the given <paramref name="model"/>..</summary>
