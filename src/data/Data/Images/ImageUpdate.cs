@@ -12,5 +12,8 @@ public sealed class ImageUpdate
 
 	/// <inheritdoc cref="IImageInfo.Hash"/>
 	public ValueUpdate<HashInfo> Hash { get; set; }
+
+	/// <inheritdoc cref="IAudioFileReferencesInfo.AudioFileIds"/>
+	public ListUpdate<string> AudioFileIds { get; set; } = new();
 	#endregion
 }

@@ -3,7 +3,7 @@ namespace OwlShed.Hushit.Data.Images;
 /// <summary>
 /// 	Represents information about an image.
 /// </summary>
-public interface IImageInfo : IDataModel<MutableImage, ImageUpdate>
+public interface IImageInfo : IDataModel<MutableImage, ImageUpdate>, IAudioFileReferencesInfo
 {
 	#region Properties
 	/// <summary>The path to the image file.</summary>

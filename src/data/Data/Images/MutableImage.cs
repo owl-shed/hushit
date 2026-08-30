@@ -11,6 +11,9 @@ public sealed class MutableImage : MutableDataModelBase<MutableImage, ImageUpdat
 
 	/// <inheritdoc cref="IImageInfo.Hash"/>
 	public HashInfo? Hash { get; set; }
+
+	/// <inheritdoc cref="IAudioFileReferencesInfo.AudioFileIds"/>
+	public IList<string> AudioFileIds { get; set; } = [];
 	#endregion
 
 	#region Methods
@@ -23,11 +26,11 @@ public sealed class MutableImage : MutableDataModelBase<MutableImage, ImageUpdat
 		if (Hash is null)
 			ThrowHelper.ThrowInvalidOperationException($"Expected the new '{nameof(Hash)}' to have a value.");
 
-
 		return new()
 		{
 			Path = Update.Value(oldState.Path, Path),
 			Hash = oldState.Hash is null ? Hash.Value : Update.Value(oldState.Hash, Hash),
+			AudioFileIds = Update.List(oldState.AudioFileIds, AudioFileIds),
 		};
 	}
 	#endregion

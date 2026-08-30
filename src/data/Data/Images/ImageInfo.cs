@@ -2,6 +2,11 @@ namespace OwlShed.Hushit.Data.Images;
 
 internal sealed class ImageInfo : DataModelBase<IImageInfo, MutableImage, ImageUpdate>, IImageInfo
 {
+	#region Fields
+	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+	private readonly ObservableCollection<string> _audioFileIds = [];
+	#endregion
+
 	#region Properties
 	/// <inheritdoc/>
 	protected override IDataRepository<IImageInfo, MutableImage, ImageUpdate> Repository => Data.Images;
@@ -11,6 +16,9 @@ internal sealed class ImageInfo : DataModelBase<IImageInfo, MutableImage, ImageU
 
 	/// <inheritdoc/>
 	public HashInfo Hash { get => Read(ref field); private set => TrySet(ref field, value); }
+
+	/// <inheritdoc/>
+	public ReadOnlyObservableCollection<string> AudioFileIds => new(_audioFileIds);
 	#endregion
 
 	#region Constructors
@@ -34,7 +42,8 @@ internal sealed class ImageInfo : DataModelBase<IImageInfo, MutableImage, ImageU
 		return new()
 		{
 			Path = Path,
-			Hash = Hash
+			Hash = Hash,
+			AudioFileIds = [.. _audioFileIds],
 		};
 	}
 
@@ -51,6 +60,19 @@ internal sealed class ImageInfo : DataModelBase<IImageInfo, MutableImage, ImageU
 
 		Path = state.Path;
 		Hash = state.Hash.Value;
+		_audioFileIds.Replace(state.AudioFileIds);
+	}
+
+	/// <inheritdoc/>
+	public async IAsyncEnumerable<IAudioFileInfo> GetAudioFilesAsync([EnumeratorCancellation] CancellationToken cancellation = default)
+	{
+		foreach (string id in _audioFileIds)
+		{
+			IAudioFileInfo? file = await Data.AudioFiles.TryGetAsync(id, cancellation).ConfigureAwait(false);
+
+			if (file is not null)
+				yield return file;
+		}
 	}
 	#endregion
 }
