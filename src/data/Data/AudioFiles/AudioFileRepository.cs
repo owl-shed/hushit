@@ -93,7 +93,7 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 	#endregion
 
 	#region Persist methods
-	public async ValueTask<IAudioFileInfo> CreateAsync(string path, CancellationToken cancellation = default)
+	public async ValueTask<IAudioFileInfo> CreateAsync(string path, bool force, CancellationToken cancellation = default)
 	{
 		path = Path.GetNormalised(path);
 
@@ -106,7 +106,7 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 			file = await TryGetAsync(pathId, cancellation).ConfigureAwait(false);
 			if (file is not null)
 			{
-				await TryReloadAsync(file, cancellation).ConfigureAwait(false);
+				await ReloadAsync(file, force, cancellation).ConfigureAwait(false);
 				return file;
 			}
 			await PathIndex.RemoveAsync(pathId, cancellation).ConfigureAwait(false);

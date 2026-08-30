@@ -16,6 +16,9 @@ root.CustomiseOption<HelpOption>(o =>
 		o.Action = new CustomHelpAction(defaultHelp);
 });
 
+root.Add(new ImportCommand());
+root.Add(new ReloadCommand());
+
 root.SetAction(async (parse, cancellation) =>
 {
 	HostApplicationBuilder builder = Host.CreateEmptyApplicationBuilder(new()
@@ -34,7 +37,9 @@ root.SetAction(async (parse, cancellation) =>
 	builder.Logging.AddDebug();
 
 	IHost host = builder.Build();
-	await host.RunAsync(cancellation);
+
+	// Todo(Nightowl): Don't run for now since nothing shows up and it's confusing;
+	//await host.RunAsync(cancellation);
 });
 
 ParseResult result = root.Parse(args);
