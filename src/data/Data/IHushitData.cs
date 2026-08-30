@@ -34,7 +34,7 @@ public sealed class HushitData : IHushitData
 	public IAudioFileRepository AudioFiles { get; }
 
 	/// <inheritdoc/>
-	public IArtistRepository Artists => throw new NotImplementedException();
+	public IArtistRepository Artists { get; }
 
 	/// <inheritdoc/>
 	public IAlbumRepository Albums => throw new NotImplementedException();
@@ -59,6 +59,9 @@ public sealed class HushitData : IHushitData
 
 		string imageDirectory = Path.Combine(directory, "images");
 		Images = new ImageRepository(this, imageDirectory);
+
+		string artistDirectory = Path.Combine(directory, "artists");
+		Artists = new ArtistRepository(this, artistDirectory);
 	}
 	#endregion
 }

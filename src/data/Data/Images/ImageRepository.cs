@@ -73,7 +73,7 @@ internal sealed partial class ImageRepository : JsonDataRepositoryBase<IImageInf
 		HashInfo hash = await GetHashAsync(path, PreferredHash, cancellation).ConfigureAwait(false);
 		string hashId = await HashIndex.GetOrAddAsync(hash.ToString(), id, cancellation).ConfigureAwait(false);
 
-		IImageInfo? image = null;
+		IImageInfo? image;
 		if (hashId != id)
 		{
 			image = await TryGetAsync(hashId, cancellation).ConfigureAwait(false);
@@ -113,6 +113,8 @@ internal sealed partial class ImageRepository : JsonDataRepositoryBase<IImageInf
 	protected override async ValueTask StopPersistingAsync(string id, string directory, CancellationToken cancellation = default)
 	{
 		await base.StopPersistingAsync(id, directory, cancellation).ConfigureAwait(false);
+
+		await DeleteBackreferencesAsync(id, AudioFileBackRefName, cancellation).ConfigureAwait(false);
 		await HashIndex.RemoveAsync(id, cancellation).ConfigureAwait(false);
 	}
 	#endregion

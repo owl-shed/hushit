@@ -100,7 +100,7 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 		string id = CreateNewId();
 		string pathId = await PathIndex.GetOrAddAsync(path, id, cancellation).ConfigureAwait(false);
 
-		IAudioFileInfo? file = null;
+		IAudioFileInfo? file;
 		if (pathId != id)
 		{
 			file = await TryGetAsync(pathId, cancellation).ConfigureAwait(false);
@@ -121,14 +121,7 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 			mutable.Hash = hash;
 			mutable.TrackName = trackName;
 
-			Task extractTask = AudioMetadataExtractor.ExtractAsync(path, mutable, cancellation).AsTask();
-			Task<IImageInfo?> coverTask = ExtractCoverAsync(path, cancellation).AsTask();
-
-			await Task.WhenAll(extractTask, coverTask).ConfigureAwait(false);
-
-			IImageInfo? cover = await coverTask;
-			mutable.CoverImageId = cover?.Id;
-
+			await UpdateFromMetadataAsync(mutable, path, cancellation).ConfigureAwait(false);
 		}, cancellation).ConfigureAwait(false);
 
 		return file;
@@ -163,19 +156,28 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 		return await UpdateAsync(file.Id, async (mutable, cancellation) =>
 		{
 			mutable.Hash = newHash;
-			Task extractTask = AudioMetadataExtractor.ExtractAsync(file.Path, mutable, cancellation).AsTask();
-			Task<IImageInfo?> coverTask = ExtractCoverAsync(file.Path, cancellation).AsTask();
-
-			await Task.WhenAll(extractTask, coverTask).ConfigureAwait(false);
-
-			IImageInfo? cover = await coverTask;
-			mutable.CoverImageId = cover?.Id;
-		});
+			await UpdateFromMetadataAsync(mutable, file.Path, cancellation).ConfigureAwait(false);
+		}).ConfigureAwait(false);
 	}
 	protected override async ValueTask StopPersistingAsync(string id, string directory, CancellationToken cancellation = default)
 	{
 		await base.StopPersistingAsync(id, directory, cancellation).ConfigureAwait(false);
 		await PathIndex.RemoveAsync(id, cancellation).ConfigureAwait(false);
+	}
+	private async ValueTask UpdateFromMetadataAsync(MutableAudioFile mutable, string path, CancellationToken cancellation = default)
+	{
+		cancellation.ThrowIfCancellationRequested();
+
+		Task extractTask = AudioMetadataExtractor.ExtractAsync(path, mutable, cancellation).AsTask();
+		Task<IImageInfo?> coverTask = ExtractCoverAsync(path, cancellation).AsTask();
+
+		await Task.WhenAll(extractTask, coverTask).ConfigureAwait(false);
+
+		IImageInfo? cover = await coverTask;
+		mutable.CoverImageId = cover?.Id;
+
+		foreach (string artist in mutable.TrackArtists.Concat(mutable.AlbumArtists))
+			_ = await Data.Artists.GetOrCreateAsync(artist, cancellation).ConfigureAwait(false);
 	}
 	#endregion
 

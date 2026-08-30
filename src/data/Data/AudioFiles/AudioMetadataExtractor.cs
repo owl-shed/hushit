@@ -78,6 +78,11 @@ internal static class AudioMetadataExtractor
 	}
 	private static void ExtractMetadata(JsonElement format, JsonElement audio, JsonElement tags, MutableAudioFile file)
 	{
+		file.TrackArtists.Clear();
+		file.AlbumArtists.Clear();
+		file.TrackGenres.Clear();
+		file.AlbumGenres.Clear();
+
 		bool TryGetFormatProperty(out JsonElement element, params ReadOnlySpan<string> names)
 		{
 			return AudioMetadataExtractor.TryGetFormatProperty(audio, format, out element, names);
@@ -110,13 +115,13 @@ internal static class AudioMetadataExtractor
 			else if (IsTagName(tag, "album"))
 				file.AlbumName = value;
 			else if (IsTagName(tag, "artist", "artists", "track_artist", "track_artists"))
-				TryAddUnique(file.TrackArtists, value);
+				TryAddUniqueFromList(file.TrackArtists, value);
 			else if (IsTagName(tag, "album_artist", "album_artists"))
-				TryAddUnique(file.AlbumArtists, value);
+				TryAddUniqueFromList(file.AlbumArtists, value);
 			else if (IsTagName(tag, "genre", "genres", "track_genre", "track_genres"))
-				TryAddUnique(file.TrackGenres, value);
+				TryAddUniqueFromList(file.TrackGenres, value);
 			else if (IsTagName(tag, "album_genre", "album_genres"))
-				TryAddUnique(file.AlbumGenres, value);
+				TryAddUniqueFromList(file.AlbumGenres, value);
 			else if (IsTagName(tag, "date"))
 			{
 				if (DateOnly.TryParse(value, out DateOnly date))
@@ -191,6 +196,25 @@ internal static class AudioMetadataExtractor
 
 		if (list.Contains(value) is false)
 			list.Add(value);
+	}
+	private static void TryAddUniqueFromList(IList<string> list, string? value)
+	{
+		if (value is null)
+			return;
+
+		string[] values = value.Split([";", ",", " feat.", " feat "], StringSplitOptions.TrimEntries);
+		TryAddUniqueFromList(list, values);
+	}
+	private static void TryAddUniqueFromList(IList<string> list, IList<string>? values)
+	{
+		if (values is null)
+			return;
+
+		foreach (string value in values)
+		{
+			if (list.Contains(value) is false)
+				list.Add(value);
+		}
 	}
 	private static bool IsTagName(JsonProperty property, params ReadOnlySpan<string> names)
 	{

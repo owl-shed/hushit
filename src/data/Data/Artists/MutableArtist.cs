@@ -11,15 +11,6 @@ public sealed class MutableArtist : MutableDataModelBase<MutableArtist, ArtistUp
 
 	/// <inheritdoc cref="IArtistInfo.Aliases"/>
 	public IList<string> Aliases { get; set; } = [];
-
-	/// <inheritdoc cref="IGenreReferencesInfo.GenreIds"/>
-	public IList<string> GenreIds { get; set; } = [];
-
-	/// <inheritdoc cref="ITrackReferencesInfo.TrackIds"/>
-	public IList<string> TrackIds { get; set; } = [];
-
-	/// <inheritdoc cref="IAlbumReferencesInfo.AlbumIds"/>
-	public IList<string> AlbumIds { get; set; } = [];
 	#endregion
 
 	#region Update methods
@@ -33,9 +24,6 @@ public sealed class MutableArtist : MutableDataModelBase<MutableArtist, ArtistUp
 		{
 			Name = Update.Value(oldState.Name, Name),
 			Aliases = Update.List(oldState.Aliases, Aliases),
-			AlbumIds = Update.List(oldState.AlbumIds, AlbumIds),
-			TrackIds = Update.List(oldState.TrackIds, TrackIds),
-			GenreIds = Update.List(oldState.GenreIds, GenreIds),
 		};
 	}
 	#endregion

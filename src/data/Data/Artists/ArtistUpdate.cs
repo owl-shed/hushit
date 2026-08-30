@@ -11,14 +11,5 @@ public sealed class ArtistUpdate
 
 	/// <inheritdoc cref="IArtistInfo.Aliases"/>
 	public ListUpdate<string> Aliases { get; set; } = new();
-
-	/// <inheritdoc cref="IGenreReferencesInfo.GenreIds"/>
-	public ListUpdate<string> GenreIds { get; set; } = new();
-
-	/// <inheritdoc cref="ITrackReferencesInfo.TrackIds"/>
-	public ListUpdate<string> TrackIds { get; set; } = new();
-
-	/// <inheritdoc cref="IAlbumReferencesInfo.AlbumIds"/>
-	public ListUpdate<string> AlbumIds { get; set; } = new();
 	#endregion
 }

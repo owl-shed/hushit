@@ -77,4 +77,20 @@ internal abstract class DataModelBase<TModel, TMutable, TUpdate> : ObservableBas
 			return base.TrySet(ref field, newValue, property);
 	}
 	#endregion
+
+	#region Helpers
+	protected async IAsyncEnumerable<T> GetReferencedAsync<T>(IDataRepository<T> repository, IEnumerable<string> ids, [EnumeratorCancellation] CancellationToken cancellation = default)
+		where T : IDataModel
+	{
+		using (Lock.ReadLock())
+			ids = ids.ToArray();
+
+		foreach (string id in ids)
+		{
+			T? model = await repository.TryGetAsync(id, cancellation).ConfigureAwait(false);
+			if (model is not null)
+				yield return model;
+		}
+	}
+	#endregion
 }

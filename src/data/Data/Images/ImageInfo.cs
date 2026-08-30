@@ -12,7 +12,7 @@ internal sealed class ImageInfo : DataModelBase<IImageInfo, MutableImage, ImageU
 	/// <inheritdoc/>
 	public HashInfo Hash { get => Read(ref field); private set => TrySet(ref field, value); }
 
-	/// <inheritdoc/>
+	/// <inheritdoc cref="IAudioFileReferencesInfo.AudioFileIds"/>
 	/// <remarks>This should only be modified by the repository.</remarks>
 	public ObservableCollection<string> AudioFileIds { get; } = [];
 	ReadOnlyObservableCollection<string> IAudioFileReferencesInfo.AudioFileIds => new(AudioFileIds);
@@ -59,20 +59,6 @@ internal sealed class ImageInfo : DataModelBase<IImageInfo, MutableImage, ImageU
 	}
 
 	/// <inheritdoc/>
-	public async IAsyncEnumerable<IAudioFileInfo> GetAudioFilesAsync([EnumeratorCancellation] CancellationToken cancellation = default)
-	{
-		string[] ids;
-
-		using (Lock.ReadLock())
-			ids = [.. AudioFileIds];
-
-		foreach (string id in ids)
-		{
-			IAudioFileInfo? file = await Data.AudioFiles.TryGetAsync(id, cancellation).ConfigureAwait(false);
-
-			if (file is not null)
-				yield return file;
-		}
-	}
+	public IAsyncEnumerable<IAudioFileInfo> GetAudioFilesAsync(CancellationToken cancellation = default) => GetReferencedAsync(Data.AudioFiles, AudioFileIds, cancellation);
 	#endregion
 }
