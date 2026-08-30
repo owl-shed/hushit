@@ -69,6 +69,9 @@ public interface IAudioFileInfo : IDataModel<MutableAudioFile, AudioFileUpdate>
 
 	/// <summary>The fingerprint of the audio.</summary>
 	FingerprintInfo? Fingerprint { get; }
+
+	/// <summary>The id of the cover image.</summary>
+	string? CoverImageId { get; }
 	#endregion
 
 	#region Methods
@@ -91,5 +94,11 @@ public interface IAudioFileInfo : IDataModel<MutableAudioFile, AudioFileUpdate>
 	/// <returns>The track that the audio file is linked to, or <see langword="null"/> if the track didn't belong to an audio file.</returns>
 	/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
 	ValueTask<ITrackInfo?> GetTrackAsync(CancellationToken cancellation = default);
+
+	/// <summary>Gets the cover image that the audio file is linked to.</summary>
+	/// <param name="cancellation">A cancellation token that can be used to cancel the operation.</param>
+	/// <returns>The cover image that the audio file is linked to, or <see langword="null"/> if the audio file didn't have an image.</returns>
+	/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
+	ValueTask<IImageInfo?> GetCoverImageAsync(CancellationToken cancellation = default);
 	#endregion
 }

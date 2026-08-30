@@ -20,55 +20,58 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 		public required string TrackName { get; init; }
 
 		[JsonPropertyName("track_date")]
-		public required string? TrackDate { get; init; }
+		public string? TrackDate { get; init; }
 
 		[JsonPropertyName("track_id")]
-		public required string? TrackId { get; init; }
+		public string? TrackId { get; init; }
 
 		[JsonPropertyName("album_name")]
-		public required string? AlbumName { get; init; }
+		public string? AlbumName { get; init; }
 
 		[JsonPropertyName("album_date")]
-		public required string? AlbumDate { get; init; }
+		public string? AlbumDate { get; init; }
 
 		[JsonPropertyName("track_artists")]
-		public required string[] TrackArtists { get; init; }
+		public string[] TrackArtists { get => field ??= []; init; }
 
 		[JsonPropertyName("album_artists")]
-		public required string[] AlbumArtists { get; init; }
+		public string[] AlbumArtists { get => field ??= []; init; }
 
 		[JsonPropertyName("track_genres")]
-		public required string[] TrackGenres { get; init; }
+		public string[] TrackGenres { get => field ??= []; init; }
 
 		[JsonPropertyName("album_genres")]
-		public required string[] AlbumGenres { get; init; }
+		public string[] AlbumGenres { get => field ??= []; init; }
 
 		[JsonPropertyName("duration")]
-		public required double? Duration { get; init; }
+		public double? Duration { get; init; }
 
 		[JsonPropertyName("track_number")]
-		public required int? TrackNumber { get; init; }
+		public int? TrackNumber { get; init; }
 
 		[JsonPropertyName("total_tracks")]
-		public required int? TotalTracks { get; init; }
+		public int? TotalTracks { get; init; }
 
 		[JsonPropertyName("container_format")]
-		public required string? ContainerFormat { get; init; }
+		public string? ContainerFormat { get; init; }
 
 		[JsonPropertyName("audio_format")]
-		public required string? AudioFormat { get; init; }
+		public string? AudioFormat { get; init; }
 
 		[JsonPropertyName("bit_rate")]
-		public required int? BitRate { get; init; }
+		public int? BitRate { get; init; }
 
 		[JsonPropertyName("sample_rate")]
-		public required int? SampleRate { get; init; }
+		public int? SampleRate { get; init; }
 
 		[JsonPropertyName("channels")]
-		public required int? Channels { get; init; }
+		public int? Channels { get; init; }
 
 		[JsonPropertyName("fingerprint")]
-		public required string? Fingerprint { get; init; }
+		public string? Fingerprint { get; init; }
+
+		[JsonPropertyName("cover_image_id")]
+		public string? CoverImageId { get; init; }
 		#endregion
 	}
 	#endregion
@@ -119,7 +122,13 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 				.WithHash(hash)
 				.WithTrackName(trackName);
 
-			await AudioMetadataExtractor.ExtractAsync(path, mutable, cancellation).ConfigureAwait(false);
+			Task extractTask = AudioMetadataExtractor.ExtractAsync(path, mutable, cancellation).AsTask();
+			Task<IImageInfo?> coverTask = ExtractCoverAsync(path, cancellation).AsTask();
+
+			await Task.WhenAll(extractTask, coverTask).ConfigureAwait(false);
+
+			IImageInfo? cover = await coverTask;
+			mutable.CoverImageId = cover?.Id;
 
 		}, cancellation).ConfigureAwait(false);
 
@@ -155,7 +164,13 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 		return await UpdateAsync(file.Id, async (mutable, cancellation) =>
 		{
 			mutable.Hash = newHash;
-			await AudioMetadataExtractor.ExtractAsync(file.Path, mutable, cancellation).ConfigureAwait(false);
+			Task extractTask = AudioMetadataExtractor.ExtractAsync(file.Path, mutable, cancellation).AsTask();
+			Task<IImageInfo?> coverTask = ExtractCoverAsync(file.Path, cancellation).AsTask();
+
+			await Task.WhenAll(extractTask, coverTask).ConfigureAwait(false);
+
+			IImageInfo? cover = await coverTask;
+			mutable.CoverImageId = cover?.Id;
 		});
 	}
 	protected override async ValueTask OnRemovedAsync(AudioFileInfo model, CancellationToken cancellation = default)
@@ -194,6 +209,7 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 			SampleRate = mutable.SampleRate,
 			Channels = mutable.Channels,
 			Fingerprint = mutable.Fingerprint?.ToString(),
+			CoverImageId = mutable.CoverImageId,
 		};
 
 	}
@@ -221,7 +237,27 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 			SampleRate = json.SampleRate,
 			Channels = json.Channels,
 			Fingerprint = FingerprintInfo.TryParse(json.Fingerprint),
+			CoverImageId = json.CoverImageId,
 		};
+	}
+	#endregion
+
+	#region Helpers
+	private async ValueTask<IImageInfo?> ExtractCoverAsync(string audioPath, CancellationToken cancellation = default)
+	{
+		cancellation.ThrowIfCancellationRequested();
+
+		string? imagePath = await AudioMetadataExtractor.ExtractCoverAsync(audioPath, cancellation).ConfigureAwait(false);
+		if (imagePath is null)
+			return null;
+
+		IImageInfo? image = await Data.Images.CreateAsync(imagePath, cancellation).ConfigureAwait(false);
+		File.Delete(imagePath);
+
+		string? directory = Path.GetDirectoryName(imagePath);
+		Directory.DeleteIfEmpty(directory);
+
+		return image;
 	}
 	#endregion
 

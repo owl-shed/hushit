@@ -104,6 +104,9 @@ internal sealed class AudioFileInfo : DataModelBase<IAudioFileInfo, MutableAudio
 
 	/// <inheritdoc/>
 	public FingerprintInfo? Fingerprint { get => Read(ref field); private set => TrySet(ref field, value); }
+
+	/// <inheritdoc/>
+	public string? CoverImageId { get => Read(ref field); private set => TrySet(ref field, value); }
 	#endregion
 
 	#region Constructors
@@ -133,6 +136,18 @@ internal sealed class AudioFileInfo : DataModelBase<IAudioFileInfo, MutableAudio
 			return null;
 
 		return await Data.Tracks.TryGetAsync(id, cancellation).ConfigureAwait(false);
+	}
+
+	/// <inheritdoc/>
+	public async ValueTask<IImageInfo?> GetCoverImageAsync(CancellationToken cancellation = default)
+	{
+		cancellation.ThrowIfCancellationRequested();
+		string? id = CoverImageId;
+
+		if (id is null)
+			return null;
+
+		return await Data.Images.TryGetAsync(id, cancellation).ConfigureAwait(false);
 	}
 
 	/// <inheritdoc/>
@@ -172,6 +187,7 @@ internal sealed class AudioFileInfo : DataModelBase<IAudioFileInfo, MutableAudio
 			SampleRate = SampleRate,
 			Channels = Channels,
 			Fingerprint = Fingerprint,
+			CoverImageId = CoverImageId,
 		};
 	}
 	internal override void CopyState(MutableAudioFile state)
@@ -209,6 +225,7 @@ internal sealed class AudioFileInfo : DataModelBase<IAudioFileInfo, MutableAudio
 		SampleRate = state.SampleRate;
 		Channels = state.Channels;
 		Fingerprint = state.Fingerprint;
+		CoverImageId = state.CoverImageId;
 	}
 	#endregion
 }

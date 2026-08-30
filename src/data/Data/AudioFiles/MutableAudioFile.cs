@@ -65,6 +65,9 @@ public sealed class MutableAudioFile : MutableDataModelBase<MutableAudioFile, Au
 
 	/// <inheritdoc cref="IAudioFileInfo.Fingerprint"/>
 	public FingerprintInfo? Fingerprint { get; set; }
+
+	/// <inheritdoc cref="IAudioFileInfo.CoverImageId"/>
+	public string? CoverImageId { get; set; }
 	#endregion
 
 	#region Builder methods
@@ -248,6 +251,7 @@ public sealed class MutableAudioFile : MutableDataModelBase<MutableAudioFile, Au
 			SampleRate = Update.Nullable(oldState.SampleRate, SampleRate),
 			Channels = Update.Nullable(oldState.Channels, Channels),
 			Fingerprint = Update.Nullable(oldState.Fingerprint, Fingerprint),
+			CoverImageId = Update.Nullable(oldState.CoverImageId, CoverImageId)
 		};
 	}
 	#endregion

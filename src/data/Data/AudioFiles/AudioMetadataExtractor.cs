@@ -44,7 +44,7 @@ internal static class AudioMetadataExtractor
 		foreach (JsonElement streamElement in root.GetProperty("streams").EnumerateArray())
 		{
 			stream++;
-			if (streamElement.TryGetProperty("codec_type", out JsonElement codec) && codec.GetString() == "video_codec")
+			if (streamElement.TryGetProperty("codec_type", out JsonElement codec) && codec.GetString() == "video")
 			{
 				lastVideo = stream;
 
@@ -106,7 +106,7 @@ internal static class AudioMetadataExtractor
 			string value = (tag.Value.ValueKind is JsonValueKind.String ? tag.Value.GetString() : null) ?? tag.Value.ToString();
 
 			if (IsTagName(tag, "title"))
-				file.WithTrack(value);
+				file.WithTrackName(value);
 			else if (IsTagName(tag, "album"))
 				file.WithAlbumName(value);
 			else if (IsTagName(tag, "artist", "artists", "track_artist", "track_artists"))

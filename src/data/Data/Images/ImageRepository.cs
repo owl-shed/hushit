@@ -57,7 +57,7 @@ internal sealed partial class ImageRepository : JsonDataRepositoryBase<IImageInf
 			Directory.CreateDirectory(directory);
 
 			string ext = Path.GetExtension(path);
-			string destinationPath = Path.Combine(id, "original" + ext);
+			string destinationPath = Path.Combine(directory, "original" + ext);
 			File.Copy(path, destinationPath);
 
 
