@@ -126,6 +126,21 @@ public interface IDataRepository<TModel, TMutable> : IDataRepository<TModel>
 }
 
 /// <summary>
+/// 	Represents the kind of the model update.
+/// </summary>
+public enum ModelUpdateKind
+{
+	/// <summary>The model was added.</summary>
+	Added,
+
+	/// <summary>The model was removed.</summary>
+	Removed,
+
+	/// <summary>The model was changed.</summary>
+	Changed,
+}
+
+/// <summary>
 /// 	Represents the arguments for a model update event.
 /// </summary>
 /// <typeparam name="TModel">The type of the model that was updated.</typeparam>
@@ -137,6 +152,9 @@ public readonly struct ModelUpdateInfo<TModel, TMutable, TUpdate>
 	where TUpdate : notnull
 {
 	#region Properties
+	/// <summary>The kind of the update.</summary>
+	public ModelUpdateKind Kind { get; }
+
 	/// <summary>The model that was updated.</summary>
 	public TModel Model { get; }
 
@@ -152,12 +170,14 @@ public readonly struct ModelUpdateInfo<TModel, TMutable, TUpdate>
 
 	#region Constructors
 	/// <summary>Creates a new instance of the <see cref="ModelUpdateInfo{TModel, TMutable, TUpdate}"/>.</summary>
+	/// <param name="kind">The kind of the update.</param>
 	/// <param name="model">The model that was updated.</param>
 	/// <param name="oldState">The old state of the model.</param>
 	/// <param name="newState">The new state of the model.</param>
 	/// <param name="update">The update from the old state, to the new state of the model.</param>
-	public ModelUpdateInfo(TModel model, TMutable oldState, TMutable newState, TUpdate update)
+	public ModelUpdateInfo(ModelUpdateKind kind, TModel model, TMutable oldState, TMutable newState, TUpdate update)
 	{
+		Kind = kind;
 		Model = model;
 		Old = oldState;
 		New = newState;

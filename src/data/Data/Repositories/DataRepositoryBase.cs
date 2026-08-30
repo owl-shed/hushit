@@ -62,6 +62,12 @@ internal abstract class DataRepositoryBase<TModel, TMutable, TUpdate, TTypedMode
 		await OnCreatedAsync(model, cancellation).ConfigureAwait(false);
 		await _modelAdded.RaiseSequentialAsync(model, cancellation).ConfigureAwait(false);
 
+		TMutable oldState = new();
+		TMutable newState = model.ToMutable();
+		TUpdate update = newState.GetUpdateFrom(oldState);
+
+		await _modelUpdated.RaiseSequentialAsync(new(ModelUpdateKind.Added, model, oldState, newState, update), cancellation).ConfigureAwait(false);
+
 		return model;
 	}
 
@@ -89,6 +95,12 @@ internal abstract class DataRepositoryBase<TModel, TMutable, TUpdate, TTypedMode
 		await OnCreatedAsync(model, cancellation).ConfigureAwait(false);
 		await _modelAdded.RaiseSequentialAsync(model, cancellation).ConfigureAwait(false);
 
+		TMutable oldState = new();
+		TMutable newState = model.ToMutable();
+		TUpdate update = newState.GetUpdateFrom(oldState);
+
+		await _modelUpdated.RaiseSequentialAsync(new(ModelUpdateKind.Added, model, oldState, newState, update), cancellation).ConfigureAwait(false);
+
 		return model;
 	}
 	protected virtual ValueTask OnCreatedAsync(TTypedModel model, CancellationToken cancellation = default) => default;
@@ -113,9 +125,12 @@ internal abstract class DataRepositoryBase<TModel, TMutable, TUpdate, TTypedMode
 		cancellation.ThrowIfCancellationRequested();
 		return await TryGetCoreAsync(id, cancellation).ConfigureAwait(false);
 	}
-	private async ValueTask<TTypedModel?> TryGetCoreAsync(string id, CancellationToken cancellation = default)
+	protected async ValueTask<TTypedModel?> TryGetCoreAsync(string? id, CancellationToken cancellation = default)
 	{
 		cancellation.ThrowIfCancellationRequested();
+
+		if (id is null)
+			return null;
 
 		if (TryGetCached(id, out TTypedModel? model))
 			return model;
@@ -145,7 +160,7 @@ internal abstract class DataRepositoryBase<TModel, TMutable, TUpdate, TTypedMode
 		await PersistAsync(model, cancellation).ConfigureAwait(false);
 
 		await OnUpdateAsync(model, oldState, newState, update, cancellation).ConfigureAwait(false);
-		await _modelUpdated.RaiseSequentialAsync(new(model, oldState, newState, update), cancellation).ConfigureAwait(false);
+		await _modelUpdated.RaiseSequentialAsync(new(ModelUpdateKind.Changed, model, oldState, newState, update), cancellation).ConfigureAwait(false);
 
 		return true;
 	}
@@ -167,7 +182,7 @@ internal abstract class DataRepositoryBase<TModel, TMutable, TUpdate, TTypedMode
 		await PersistAsync(model, cancellation).ConfigureAwait(false);
 
 		await OnUpdateAsync(model, oldState, newState, update, cancellation).ConfigureAwait(false);
-		await _modelUpdated.RaiseSequentialAsync(new(model, oldState, newState, update), cancellation).ConfigureAwait(false);
+		await _modelUpdated.RaiseSequentialAsync(new(ModelUpdateKind.Changed, model, oldState, newState, update), cancellation).ConfigureAwait(false);
 
 		return true;
 	}
@@ -189,6 +204,12 @@ internal abstract class DataRepositoryBase<TModel, TMutable, TUpdate, TTypedMode
 
 		await OnRemovedAsync(model, cancellation).ConfigureAwait(false);
 		await _modelRemoved.RaiseSequentialAsync(model, cancellation).ConfigureAwait(false);
+
+		TMutable oldState = model.ToMutable();
+		TMutable newState = new();
+		TUpdate update = newState.GetUpdateFrom(oldState);
+
+		await _modelUpdated.RaiseSequentialAsync(new(ModelUpdateKind.Removed, model, oldState, newState, update), cancellation).ConfigureAwait(false);
 
 		return true;
 	}

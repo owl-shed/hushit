@@ -19,6 +19,7 @@ internal sealed partial class ImageRepository : JsonDataRepositoryBase<IImageInf
 	#endregion
 
 	#region Constants
+	private const string AudioFileBackRefName = "audio_files";
 	private const string PreferredHash = "sha256";
 	#endregion
 
@@ -31,6 +32,37 @@ internal sealed partial class ImageRepository : JsonDataRepositoryBase<IImageInf
 	public ImageRepository(IHushitData data, string baseDirectory) : base(data, baseDirectory)
 	{
 		HashIndex = new(IndexDirectory, "by_hash");
+
+		Data.AudioFiles.ModelUpdated.Subscribe(AudioFileUpdatedAsync);
+	}
+	#endregion
+
+	#region React methods
+	private async ValueTask AudioFileUpdatedAsync(ModelUpdateInfo<IAudioFileInfo, MutableAudioFile, AudioFileUpdate> update, CancellationToken cancellation)
+	{
+		if (update.Update.CoverImageId.HasChanged)
+		{
+			ImageInfo? oldImage = await TryGetCoreAsync(update.Old.CoverImageId, cancellation).ConfigureAwait(false);
+			if (oldImage is not null)
+			{
+				oldImage.AudioFileIds.Remove(update.Model.Id);
+				await SaveAudioFileBackReferencesAsync(oldImage, cancellation).ConfigureAwait(false);
+			}
+
+			ImageInfo? newImage = await TryGetCoreAsync(update.New.CoverImageId, cancellation).ConfigureAwait(false);
+			if (newImage is not null)
+			{
+				newImage.AudioFileIds.Add(update.Model.Id);
+				await SaveAudioFileBackReferencesAsync(newImage, cancellation).ConfigureAwait(false);
+			}
+		}
+	}
+	#endregion
+
+	#region Backreference methods
+	private async ValueTask SaveAudioFileBackReferencesAsync(IImageInfo image, CancellationToken cancellation = default)
+	{
+		await SaveBackreferencesAsync(image.Id, AudioFileBackRefName, image.AudioFileIds, cancellation).ConfigureAwait(false);
 	}
 	#endregion
 
@@ -60,10 +92,21 @@ internal sealed partial class ImageRepository : JsonDataRepositoryBase<IImageInf
 			string destinationPath = Path.Combine(directory, "original" + ext);
 			File.Copy(path, destinationPath);
 
-
 			mutable.Path = Path.GetNormalised(destinationPath);
 			mutable.Hash = hash;
 		}).ConfigureAwait(false);
+
+		return image;
+	}
+	protected override async ValueTask<ImageInfo?> TryLoadPersistedAsync(string id, string directory, CancellationToken cancellation = default)
+	{
+		ImageInfo? image = await base.TryLoadPersistedAsync(id, directory, cancellation).ConfigureAwait(false);
+
+		if (image is null)
+			return null;
+
+		IReadOnlyList<string> audioFiles = await LoadBackreferencesAsync(id, AudioFileBackRefName, cancellation).ConfigureAwait(false);
+		image.AudioFileIds.Replace(audioFiles);
 
 		return image;
 	}
