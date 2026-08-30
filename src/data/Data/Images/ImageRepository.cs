@@ -67,10 +67,10 @@ internal sealed partial class ImageRepository : JsonDataRepositoryBase<IImageInf
 
 		return image;
 	}
-	protected override async ValueTask OnRemovedAsync(ImageInfo model, CancellationToken cancellation = default)
+	protected override async ValueTask StopPersistingAsync(string id, string directory, CancellationToken cancellation = default)
 	{
-		await base.OnRemovedAsync(model, cancellation).ConfigureAwait(false);
-		await HashIndex.RemoveAsync(model.Id, cancellation).ConfigureAwait(false);
+		await base.StopPersistingAsync(id, directory, cancellation).ConfigureAwait(false);
+		await HashIndex.RemoveAsync(id, cancellation).ConfigureAwait(false);
 	}
 	#endregion
 

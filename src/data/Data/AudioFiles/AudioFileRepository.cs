@@ -173,10 +173,10 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 			mutable.CoverImageId = cover?.Id;
 		});
 	}
-	protected override async ValueTask OnRemovedAsync(AudioFileInfo model, CancellationToken cancellation = default)
+	protected override async ValueTask StopPersistingAsync(string id, string directory, CancellationToken cancellation = default)
 	{
-		await base.OnRemovedAsync(model, cancellation).ConfigureAwait(false);
-		await PathIndex.RemoveAsync(model.Id, cancellation).ConfigureAwait(false);
+		await base.StopPersistingAsync(id, directory, cancellation).ConfigureAwait(false);
+		await PathIndex.RemoveAsync(id, cancellation).ConfigureAwait(false);
 	}
 	#endregion
 
