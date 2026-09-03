@@ -7,9 +7,9 @@ global using System.Text.Json.Serialization.Metadata;
 global using CommunityToolkit.Diagnostics;
 
 global using OwlShed.Hushit.Common;
-global using OwlShed.Hushit.Common.Locking;
 global using OwlShed.Hushit.Common.Async;
 global using OwlShed.Hushit.Common.IO;
+global using OwlShed.Hushit.Common.Locking;
 global using OwlShed.Hushit.Data.Albums;
 global using OwlShed.Hushit.Data.Artists;
 global using OwlShed.Hushit.Data.AudioFiles;
