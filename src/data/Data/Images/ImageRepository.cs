@@ -26,6 +26,7 @@ internal sealed partial class ImageRepository : JsonDataRepositoryBase<IImageInf
 	#region Properties
 	protected override JsonTypeInfo<ImageJson> TypeInfo => ImageJsonContext.Default.ImageJson;
 	private JsonDataIndex<string> HashIndex { get; }
+	private ValueLock<string> HashLock { get; } = new();
 	#endregion
 
 	#region Constructors
@@ -69,9 +70,13 @@ internal sealed partial class ImageRepository : JsonDataRepositoryBase<IImageInf
 	#region Persist methods
 	public async ValueTask<IImageInfo> CreateAsync(string path, CancellationToken cancellation = default)
 	{
-		string id = CreateNewId();
 		HashInfo hash = await GetHashAsync(path, PreferredHash, cancellation).ConfigureAwait(false);
-		string hashId = await HashIndex.GetOrAddAsync(hash.ToString(), id, cancellation).ConfigureAwait(false);
+		string hashStr = hash.ToString();
+
+		await using IAsyncDisposable _ = await HashLock.LockAsync(hashStr, cancellation).ConfigureAwait(false);
+
+		string id = CreateNewId();
+		string hashId = await HashIndex.GetOrAddAsync(hashStr, id, cancellation).ConfigureAwait(false);
 
 		IImageInfo? image;
 		if (hashId != id)

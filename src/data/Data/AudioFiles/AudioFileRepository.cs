@@ -83,6 +83,7 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 	#region Properties
 	protected override JsonTypeInfo<AudioFileJson> TypeInfo => AudioFileJsonContext.Default.AudioFileJson;
 	private JsonDataIndex<string> PathIndex { get; }
+	private ValueLock<string> PathLock { get; } = new();
 	#endregion
 
 	#region Constructors
@@ -96,6 +97,8 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 	public async ValueTask<IAudioFileInfo> CreateAsync(string path, bool force, CancellationToken cancellation = default)
 	{
 		path = Path.GetNormalised(path);
+
+		await using IAsyncDisposable _ = await PathLock.LockAsync(path, cancellation).ConfigureAwait(false);
 
 		string id = CreateNewId();
 		string pathId = await PathIndex.GetOrAddAsync(path, id, cancellation).ConfigureAwait(false);

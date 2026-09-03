@@ -27,6 +27,7 @@ internal sealed partial class ArtistRepository : JsonDataRepositoryBase<IArtistI
 	#region Properties
 	protected override JsonTypeInfo<ArtistJson> TypeInfo => ArtistJsonContext.Default.ArtistJson;
 	private JsonDataIndex<string> NameIndex { get; }
+	private ValueLock<string> NameLock { get; } = new();
 	#endregion
 
 	#region Constructors
@@ -39,6 +40,8 @@ internal sealed partial class ArtistRepository : JsonDataRepositoryBase<IArtistI
 	#region Persist methods
 	public async ValueTask<IArtistInfo> GetOrCreateAsync(string name, CancellationToken cancellation = default)
 	{
+		await using IAsyncDisposable _ = await NameLock.LockAsync(name, cancellation).ConfigureAwait(false);
+
 		string id = CreateNewId();
 		string nameId = await NameIndex.GetOrAddAsync(name, id, cancellation).ConfigureAwait(false);
 
