@@ -28,29 +28,39 @@ public sealed class ValueLock<T>
 	/// <returns>A value which will release the lock for the given <paramref name="value"/> when disposed.</returns>
 	public async ValueTask<IAsyncDisposable> LockAsync(T value, CancellationToken cancellation = default)
 	{
-		bool created = false;
+		while (true)
+		{
+			IAsyncDisposable? disposable = await TryLockAsync(value, cancellation).ConfigureAwait(false);
+			if (disposable is not null)
+				return disposable;
+		}
+	}
+	private async ValueTask<IAsyncDisposable?> TryLockAsync(T value, CancellationToken cancellation = default)
+	{
 		SemaphoreSlim? semaphore;
 		using (await _lock.LockAsync(cancellation).ConfigureAwait(false))
 		{
-			if (_locks.TryGetValue(value, out semaphore) is false)
-			{
-				created = true;
-				semaphore = new(1, 1);
-				_locks.Add(value, semaphore);
-			}
+			if (_locks.TryGetValue(value, out semaphore))
+				return null;
+
+			semaphore = new(1, 1);
+			_locks.Add(value, semaphore);
 		}
 
 		try
 		{
-			await semaphore.WaitAsync(cancellation).ConfigureAwait(false);
+			await semaphore.LockAsync(cancellation).ConfigureAwait(false);
 			return new Scope(this, value);
 		}
 		catch (OperationCanceledException)
 		{
-			if (created)
+			using (await _lock.LockAsync())
 			{
-				using (await semaphore.LockAsync().ConfigureAwait(false))
-					_locks.Remove(value);
+				if (_locks.TryGetValue(value, out SemaphoreSlim? stored))
+				{
+					if (stored == semaphore)
+						_locks.Remove(value);
+				}
 			}
 
 			throw;

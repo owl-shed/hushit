@@ -40,6 +40,9 @@ internal abstract class DataRepositoryBase<TModel, TMutable, TUpdate, TTypedMode
 
 	#region Methods
 	/// <inheritdoc/>
+	public virtual void Initialise() { }
+
+	/// <inheritdoc/>
 	public async ValueTask<TModel> CreateAsync(Func<TMutable, CancellationToken, ValueTask> callback, CancellationToken cancellation = default)
 	{
 		cancellation.ThrowIfCancellationRequested();

@@ -11,12 +11,6 @@ public sealed class MutableAlbum : MutableDataModelBase<MutableAlbum, AlbumUpdat
 
 	/// <inheritdoc cref="IArtistReferencesInfo.ArtistIds"/>
 	public IList<string> ArtistIds { get; set; } = [];
-
-	/// <inheritdoc cref="ITrackReferencesInfo.TrackIds"/>
-	public IList<string> TrackIds { get; set; } = [];
-
-	/// <inheritdoc cref="IGenreReferencesInfo.GenreIds"/>
-	public IList<string> GenreIds { get; set; } = [];
 	#endregion
 
 	#region Update methods
@@ -30,8 +24,6 @@ public sealed class MutableAlbum : MutableDataModelBase<MutableAlbum, AlbumUpdat
 		{
 			Name = Update.Value(oldState.Name, Name),
 			ArtistIds = Update.List(oldState.ArtistIds, ArtistIds),
-			TrackIds = Update.List(oldState.TrackIds, TrackIds),
-			GenreIds = Update.List(oldState.GenreIds, GenreIds),
 		};
 	}
 	#endregion

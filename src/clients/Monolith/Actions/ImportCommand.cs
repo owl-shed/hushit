@@ -44,19 +44,19 @@ internal sealed class ImportCommand : Command
 			};
 
 			string[] files = parse.GetRequiredValue(filesArgument);
+			bool force = parse.GetValue(forceOption);
 
 			if (files.Length is 1)
-				Console.Error.WriteLine($"Importing 1 audio file.");
+				Console.Error.WriteLine($"Importing 1 audio file. Force = {force}.");
 			else
-				Console.Error.WriteLine($"Importing {files.Length:n0} audio files.");
+				Console.Error.WriteLine($"Importing {files.Length:n0} audio files. Force = {force}.");
 
-			bool force = parse.GetValue(forceOption);
 
 			Stopwatch stopwatch = Stopwatch.StartNew();
 			await Parallel.ForEachAsync(files, options, async (file, cancellation) =>
 			{
 				Console.Error.WriteLine($"Importing {file}");
-				await data.AudioFiles.CreateAsync(file, force, cancellation).ConfigureAwait(false);
+				await data.AudioFiles.GetOrCreateAsync(file, force, cancellation).ConfigureAwait(false);
 			});
 
 			stopwatch.Stop();

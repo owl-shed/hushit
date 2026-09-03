@@ -37,6 +37,49 @@ internal sealed partial class ArtistRepository : JsonDataRepositoryBase<IArtistI
 	}
 	#endregion
 
+	#region Methods
+	public override void Initialise()
+	{
+		base.Initialise();
+		Data.Albums.ModelUpdated.Subscribe(AlbumUpdatedAsync);
+	}
+	#endregion
+
+	#region React methods
+	private async ValueTask AlbumUpdatedAsync(ModelUpdateInfo<IAlbumInfo, MutableAlbum, AlbumUpdate> update, CancellationToken cancellation)
+	{
+		HashSet<string> removedArtists = update.Old.ArtistIds.Except(update.New.ArtistIds).ToHashSet();
+		HashSet<string> addedArtists = update.New.ArtistIds.Except(update.Old.ArtistIds).ToHashSet();
+
+		foreach (string id in removedArtists)
+		{
+			ArtistInfo? artist = await TryGetCoreAsync(id, cancellation).ConfigureAwait(false);
+			if (artist is not null)
+			{
+				artist.AlbumIds.Remove(update.Model.Id);
+				await SaveAlbumBackReferencesAsync(artist, cancellation).ConfigureAwait(false);
+			}
+		}
+
+		foreach (string id in addedArtists)
+		{
+			ArtistInfo? artist = await TryGetCoreAsync(id, cancellation).ConfigureAwait(false);
+			if (artist is not null)
+			{
+				artist.AlbumIds.Add(update.Model.Id);
+				await SaveAlbumBackReferencesAsync(artist, cancellation).ConfigureAwait(false);
+			}
+		}
+	}
+	#endregion
+
+	#region Backreference methods
+	private async ValueTask SaveAlbumBackReferencesAsync(IArtistInfo artist, CancellationToken cancellation = default)
+	{
+		await SaveBackreferencesAsync(artist.Id, AlbumBackRefName, artist.AlbumIds, cancellation).ConfigureAwait(false);
+	}
+	#endregion
+
 	#region Persist methods
 	public async ValueTask<IArtistInfo> GetOrCreateAsync(string name, CancellationToken cancellation = default)
 	{
@@ -51,18 +94,19 @@ internal sealed partial class ArtistRepository : JsonDataRepositoryBase<IArtistI
 			artist = await TryGetAsync(nameId, cancellation).ConfigureAwait(false);
 			if (artist is not null)
 				return artist;
-
-			await NameIndex.RemoveAsync(nameId, cancellation).ConfigureAwait(false);
 		}
 
 		artist = await CreateAsync(id, async (mutable, cancellation) =>
 		{
 			mutable.Name = name;
-
 		}).ConfigureAwait(false);
-		Debug.WriteLine($"Created new artist {artist.Id} - \"{artist.Name}\"");
 
 		return artist;
+	}
+	protected override async ValueTask OnCreatedAsync(ArtistInfo model, CancellationToken cancellation = default)
+	{
+		await base.OnCreatedAsync(model, cancellation).ConfigureAwait(false);
+		await NameIndex.SetAsync(model.Id, model.Name, cancellation).ConfigureAwait(false);
 	}
 	protected override async ValueTask<ArtistInfo?> TryLoadPersistedAsync(string id, string directory, CancellationToken cancellation = default)
 	{

@@ -4,7 +4,7 @@ namespace OwlShed.Hushit.Data.Indices;
 /// 	Represents a data index that uses a JSON file for storage.
 /// </summary>
 /// <typeparam name="TValue">The type of the lookup value in the index.</typeparam>
-public partial class JsonDataIndex<TValue> : IDataIndex<TValue>
+public sealed partial class JsonDataIndex<TValue> : IDataIndex<TValue>
 	where TValue : notnull
 {
 	#region Nested types
@@ -24,10 +24,7 @@ public partial class JsonDataIndex<TValue> : IDataIndex<TValue>
 	#region Properties
 	/// <summary>The path of the JSON index file.</summary>
 	public string Path { get; }
-
-	/// <summary>The fallback type info for serialising the index data.</summary>
-	protected virtual JsonTypeInfo<Dictionary<string, TValue>>? FallbackTypeInfo => null;
-
+	private JsonTypeInfo<Dictionary<string, TValue>>? FallbackTypeInfo { get; set; }
 	private JsonTypeInfo<Dictionary<string, TValue>> TypeInfo { get; }
 	#endregion
 
@@ -41,11 +38,32 @@ public partial class JsonDataIndex<TValue> : IDataIndex<TValue>
 	}
 
 	/// <summary>Creates a new <see cref="JsonDataIndex{TValue}"/> instance.</summary>
+	/// <param name="path">The path of the JSON index file.</param>
+	/// <param name="typeInfo">The type info for serialising the json data.</param>
+	public JsonDataIndex(string path, JsonTypeInfo<Dictionary<string, TValue>> typeInfo)
+	{
+		Path = path;
+		FallbackTypeInfo = typeInfo;
+		TypeInfo = GetTypeInfo();
+	}
+
+	/// <summary>Creates a new <see cref="JsonDataIndex{TValue}"/> instance.</summary>
 	/// <param name="directory">The directory to store the index file in.</param>
 	/// <param name="name">The name (without the extension) of the file to store the index data in.</param>
 	public JsonDataIndex(string directory, string name)
 	{
 		Path = System.IO.Path.Combine(directory, $"{name}.json");
+		TypeInfo = GetTypeInfo();
+	}
+
+	/// <summary>Creates a new <see cref="JsonDataIndex{TValue}"/> instance.</summary>
+	/// <param name="directory">The directory to store the index file in.</param>
+	/// <param name="name">The name (without the extension) of the file to store the index data in.</param>
+	/// <param name="typeInfo">The type info for serialising the json data.</param>
+	public JsonDataIndex(string directory, string name, JsonTypeInfo<Dictionary<string, TValue>> typeInfo)
+	{
+		Path = System.IO.Path.Combine(directory, $"{name}.json");
+		FallbackTypeInfo = typeInfo;
 		TypeInfo = GetTypeInfo();
 	}
 	#endregion

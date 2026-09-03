@@ -6,6 +6,9 @@ namespace OwlShed.Hushit.Data.Repositories;
 public interface IDataRepository
 {
 	#region Methods
+	/// <summary>Called by the <see cref="IHushitData"/> once all of the repositories have been created.</summary>
+	void Initialise();
+
 	/// <summary>Gets all of the data models stored in the repository.</summary>
 	/// <param name="cancellation">A cancellation token that can be used to cancel the operation.</param>
 	/// <returns>An asynchronous enumerable for all of the stored data models.</returns>

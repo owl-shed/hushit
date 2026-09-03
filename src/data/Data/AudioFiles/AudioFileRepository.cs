@@ -94,7 +94,7 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 	#endregion
 
 	#region Persist methods
-	public async ValueTask<IAudioFileInfo> CreateAsync(string path, bool force, CancellationToken cancellation = default)
+	public async ValueTask<IAudioFileInfo> GetOrCreateAsync(string path, bool force, CancellationToken cancellation = default)
 	{
 		path = Path.GetNormalised(path);
 
@@ -112,7 +112,6 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 				await ReloadAsync(file, force, cancellation).ConfigureAwait(false);
 				return file;
 			}
-			await PathIndex.RemoveAsync(pathId, cancellation).ConfigureAwait(false);
 		}
 
 		file = await CreateAsync(id, async (mutable, cancellation) =>
@@ -128,6 +127,11 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 		}, cancellation).ConfigureAwait(false);
 
 		return file;
+	}
+	protected override async ValueTask OnCreatedAsync(AudioFileInfo model, CancellationToken cancellation = default)
+	{
+		await base.OnCreatedAsync(model, cancellation).ConfigureAwait(false);
+		await PathIndex.SetAsync(model.Id, model.Path, cancellation).ConfigureAwait(false);
 	}
 	public async ValueTask<bool> TryReloadAsync(IAudioFileInfo file, CancellationToken cancellation = default)
 	{
@@ -179,8 +183,24 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 		IImageInfo? cover = await coverTask;
 		mutable.CoverImageId = cover?.Id;
 
-		foreach (string artist in mutable.TrackArtists.Concat(mutable.AlbumArtists))
-			_ = await Data.Artists.GetOrCreateAsync(artist, cancellation).ConfigureAwait(false);
+		List<string> albumArtistIds = [];
+
+		foreach (string name in mutable.TrackArtists)
+			_ = await Data.Artists.GetOrCreateAsync(name, cancellation).ConfigureAwait(false);
+
+		foreach (string name in mutable.AlbumArtists)
+		{
+			IArtistInfo artist = await Data.Artists.GetOrCreateAsync(name, cancellation).ConfigureAwait(false);
+			albumArtistIds.Add(artist.Id);
+		}
+
+		if (mutable.AlbumName is not null)
+		{
+			if (albumArtistIds.Count is 0)
+				Debug.WriteLine($"Audio file: {path} has an album name but no album artists!");
+
+			_ = await Data.Albums.GetOrCreateAsync(mutable.AlbumName, albumArtistIds, cancellation).ConfigureAwait(false);
+		}
 	}
 	#endregion
 

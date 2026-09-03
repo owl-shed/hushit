@@ -33,7 +33,13 @@ internal sealed partial class ImageRepository : JsonDataRepositoryBase<IImageInf
 	public ImageRepository(IHushitData data, string baseDirectory) : base(data, baseDirectory)
 	{
 		HashIndex = new(IndexDirectory, "by_hash");
+	}
+	#endregion
 
+	#region Methods
+	public override void Initialise()
+	{
+		base.Initialise();
 		Data.AudioFiles.ModelUpdated.Subscribe(AudioFileUpdatedAsync);
 	}
 	#endregion
@@ -84,8 +90,6 @@ internal sealed partial class ImageRepository : JsonDataRepositoryBase<IImageInf
 			image = await TryGetAsync(hashId, cancellation).ConfigureAwait(false);
 			if (image is not null)
 				return image;
-
-			await HashIndex.RemoveAsync(hashId, cancellation).ConfigureAwait(false);
 		}
 
 		image = await CreateAsync(id, async (mutable, cancellation) =>
@@ -102,6 +106,11 @@ internal sealed partial class ImageRepository : JsonDataRepositoryBase<IImageInf
 		}).ConfigureAwait(false);
 
 		return image;
+	}
+	protected override async ValueTask OnCreatedAsync(ImageInfo model, CancellationToken cancellation = default)
+	{
+		await base.OnCreatedAsync(model, cancellation).ConfigureAwait(false);
+		await HashIndex.SetAsync(model.Id, model.Hash.ToString(), cancellation).ConfigureAwait(false);
 	}
 	protected override async ValueTask<ImageInfo?> TryLoadPersistedAsync(string id, string directory, CancellationToken cancellation = default)
 	{

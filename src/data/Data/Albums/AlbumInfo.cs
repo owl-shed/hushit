@@ -1,25 +1,21 @@
-namespace OwlShed.Hushit.Data.Artists;
+namespace OwlShed.Hushit.Data.Albums;
 
-internal sealed class ArtistInfo : DataModelBase<IArtistInfo, MutableArtist, ArtistUpdate>, IArtistInfo
+internal sealed class AlbumInfo : DataModelBase<IAlbumInfo, MutableAlbum, AlbumUpdate>, IAlbumInfo
 {
 	#region Fields
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private readonly ObservableCollection<string> _aliases = [];
+	private readonly ObservableCollection<string> _artistIds = [];
 	#endregion
 
 	#region Properties
 	/// <inheritdoc/>
-	protected override IDataRepository<IArtistInfo, MutableArtist, ArtistUpdate> Repository => Data.Artists;
+	protected override IDataRepository<IAlbumInfo, MutableAlbum, AlbumUpdate> Repository => Data.Albums;
 
 	/// <inheritdoc/>
 	public string Name { get => Read(ref field); private set => TrySet(ref field, value); }
 
 	/// <inheritdoc/>
-	public ReadOnlyObservableCollection<string> Aliases => new(_aliases);
-
-	/// <inheritdoc cref="IAlbumReferencesInfo.AlbumIds"/>
-	/// <remarks>This should only be modified by the repository.</remarks>
-	public ObservableCollection<string> AlbumIds { get; } = [];
+	public ReadOnlyObservableCollection<string> ArtistIds => new(_artistIds);
 
 	/// <inheritdoc cref="ITrackReferencesInfo.TrackIds"/>
 	/// <remarks>This should only be modified by the repository.</remarks>
@@ -29,17 +25,16 @@ internal sealed class ArtistInfo : DataModelBase<IArtistInfo, MutableArtist, Art
 	/// <remarks>This should only be modified by the repository.</remarks>
 	public ObservableCollection<string> GenreIds { get; } = [];
 
-	ReadOnlyObservableCollection<string> IAlbumReferencesInfo.AlbumIds => new(AlbumIds);
 	ReadOnlyObservableCollection<string> ITrackReferencesInfo.TrackIds => new(TrackIds);
 	ReadOnlyObservableCollection<string> IGenreReferencesInfo.GenreIds => new(GenreIds);
 	#endregion
 
 	#region Constructors
-	public ArtistInfo(IHushitData data, string id, string name) : base(data, id)
+	public AlbumInfo(IHushitData data, string id, string name) : base(data, id)
 	{
 		Name = name;
 	}
-	public ArtistInfo(IHushitData data, string id, MutableArtist initialState) : base(data, id)
+	public AlbumInfo(IHushitData data, string id, MutableAlbum initialState) : base(data, id)
 	{
 		CopyState(initialState);
 
@@ -47,25 +42,23 @@ internal sealed class ArtistInfo : DataModelBase<IArtistInfo, MutableArtist, Art
 	}
 	#endregion
 
-	#region Methods
-	public IAsyncEnumerable<IAlbumInfo> GetAlbumsAsync(CancellationToken cancellation = default) => GetReferencedAsync(Data.Albums, AlbumIds, cancellation);
+	public IAsyncEnumerable<IArtistInfo> GetArtistsAsync(CancellationToken cancellation = default) => GetReferencedAsync(Data.Artists, ArtistIds, cancellation);
 	public IAsyncEnumerable<IGenreInfo> GetGenresAsync(CancellationToken cancellation = default) => GetReferencedAsync(Data.Genres, GenreIds, cancellation);
 	public IAsyncEnumerable<ITrackInfo> GetTracksAsync(CancellationToken cancellation = default) => GetReferencedAsync(Data.Tracks, TrackIds, cancellation);
-	public override MutableArtist ToMutable()
+	public override MutableAlbum ToMutable()
 	{
 		return new()
 		{
 			Name = Name,
-			Aliases = [.. Aliases],
+			ArtistIds = [.. _artistIds]
 		};
 	}
-	internal override void CopyState(MutableArtist state)
+	internal override void CopyState(MutableAlbum state)
 	{
 		if (state.Name is null)
 			ThrowHelper.ThrowArgumentException(nameof(state), $"Expected the new state to have a name.");
 
 		Name = state.Name;
-		_aliases.Replace(state.Aliases);
+		_artistIds.Replace(state.ArtistIds);
 	}
-	#endregion
 }

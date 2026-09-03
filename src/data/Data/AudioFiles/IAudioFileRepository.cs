@@ -17,14 +17,14 @@ public interface IAudioFileRepository : IDataRepository<IAudioFileInfo, MutableA
 	/// </remarks>
 	new ValueTask<IAudioFileInfo> CreateAsync(Action<MutableAudioFile> callback, CancellationToken cancellation = default);
 
-	/// <summary>Creates a new data model.</summary>
+	/// <summary>Gets or creates a new audio file for the given file <paramref name="path"/>.</summary>
 	/// <param name="path">The path of the audio file.</param>
 	/// <param name="force">Whether to force reload the metadata if the audio file already existed.</param>
 	/// <param name="cancellation">A cancellation token that can be used to cancel the operation.</param>
 	/// <returns>The created data model.</returns>
 	/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
 	/// <exception cref="FileNotFoundException">Thrown if no file exists at the given <paramref name="path"/>.</exception>
-	ValueTask<IAudioFileInfo> CreateAsync(string path, bool force, CancellationToken cancellation = default);
+	ValueTask<IAudioFileInfo> GetOrCreateAsync(string path, bool force, CancellationToken cancellation = default);
 
 	/// <summary>Tries to reload the metadata for the given <paramref name="file"/>, if the file hash changed.</summary>
 	/// <param name="file">The audio file to reload the metadata for.</param>
