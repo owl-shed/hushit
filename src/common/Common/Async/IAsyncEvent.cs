@@ -1,4 +1,4 @@
-namespace OwlShed.Hushit.Common;
+namespace OwlShed.Hushit.Common.Async;
 
 /// <summary>
 /// 	Represents the base interface for asynchronous events.

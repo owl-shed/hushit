@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace OwlShed.Hushit.Common;
+namespace OwlShed.Hushit.Common.IO;
 
 /// <summary>
 /// 	Contains various extensions related to the <see cref="Directory"/> type.

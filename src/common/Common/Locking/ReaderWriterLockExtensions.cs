@@ -1,4 +1,4 @@
-namespace OwlShed.Hushit.Common;
+namespace OwlShed.Hushit.Common.Locking;
 
 /// <summary>
 /// 	Represents a scope which will exit a read lock when disposed.
