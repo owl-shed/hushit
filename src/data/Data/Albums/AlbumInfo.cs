@@ -55,6 +55,8 @@ internal sealed class AlbumInfo : DataModelBase<IAlbumInfo, MutableAlbum, AlbumU
 	}
 	internal override void CopyState(MutableAlbum state)
 	{
+		using ReaderWriterWriteLock _ = Lock.WriteLock();
+
 		if (state.Name is null)
 			ThrowHelper.ThrowArgumentException(nameof(state), $"Expected the new state to have a name.");
 
