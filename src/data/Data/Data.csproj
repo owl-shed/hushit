@@ -19,7 +19,12 @@
 		<IsTrimmable Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net6.0'))">true</IsTrimmable>
 	</PropertyGroup>
 
-	<!-- Packages -->
+	<!-- Project references -->
+	<ItemGroup Label="projects">
+		<ProjectReference Include="../../common/Common/Common.csproj" />
+	</ItemGroup>
+
+	<!-- Package references -->
 	<ItemGroup Label="packages">
 		<PackageReference Include="CommunityToolkit.Diagnostics" Version="8.4.2" />
 	</ItemGroup>

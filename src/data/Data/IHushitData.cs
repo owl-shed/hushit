@@ -20,5 +20,60 @@ public interface IHushitData
 
 	/// <summary>The data repository for genre information.</summary>
 	IGenreRepository Genres { get; }
+
+	/// <summary>The data repository for image file information.</summary>
+	IImageRepository Images { get; }
+	#endregion
+}
+
+/// <inheritdoc cref="IHushitData"/>
+public sealed class HushitData : IHushitData
+{
+	#region Properties
+	/// <inheritdoc/>
+	public IAudioFileRepository AudioFiles { get; }
+
+	/// <inheritdoc/>
+	public IArtistRepository Artists { get; }
+
+	/// <inheritdoc/>
+	public IAlbumRepository Albums { get; }
+
+	/// <inheritdoc/>
+	public ITrackRepository Tracks { get; }
+
+	/// <inheritdoc/>
+	public IGenreRepository Genres => throw new NotImplementedException();
+
+	/// <inheritdoc/>
+	public IImageRepository Images { get; }
+	#endregion
+
+	#region Constructors
+	/// <summary>Creates a new <see cref="HushitData"/> instance.</summary>
+	/// <param name="directory">The base directory to store the Hushit data in.</param>
+	public HushitData(string directory)
+	{
+		string audioFileDirectory = Path.Combine(directory, "audio_files");
+		AudioFiles = new AudioFileRepository(this, audioFileDirectory);
+
+		string imageDirectory = Path.Combine(directory, "images");
+		Images = new ImageRepository(this, imageDirectory);
+
+		string artistDirectory = Path.Combine(directory, "artists");
+		Artists = new ArtistRepository(this, artistDirectory);
+
+		string albumDirectory = Path.Combine(directory, "albums");
+		Albums = new AlbumRepository(this, albumDirectory);
+
+		string trackDirectory = Path.Combine(directory, "tracks");
+		Tracks = new TrackRepository(this, trackDirectory);
+
+		AudioFiles.Initialise();
+		Images.Initialise();
+		Artists.Initialise();
+		Albums.Initialise();
+		Tracks.Initialise();
+	}
 	#endregion
 }

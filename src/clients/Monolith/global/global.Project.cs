@@ -1,9 +1,11 @@
 global using System.CommandLine;
 global using System.CommandLine.Help;
 global using System.CommandLine.Invocation;
+global using System.IO;
 
 global using Microsoft.Extensions.Hosting;
 
+global using OwlShed.Hushit.Data;
 global using OwlShed.Hushit.Monolith.Actions;
 global using OwlShed.Hushit.Monolith.Actions.Meta;
 

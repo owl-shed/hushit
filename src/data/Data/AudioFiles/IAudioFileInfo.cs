@@ -3,7 +3,7 @@ namespace OwlShed.Hushit.Data.AudioFiles;
 /// <summary>
 /// 	Represents information about an audio file.
 /// </summary>
-public interface IAudioFileInfo : IDataModel<IAudioFileUpdate>
+public interface IAudioFileInfo : IDataModel<MutableAudioFile, AudioFileUpdate>
 {
 	#region Properties
 	/// <summary>The local path to the audio file.</summary>
@@ -16,29 +16,62 @@ public interface IAudioFileInfo : IDataModel<IAudioFileUpdate>
 	/// <remarks>If the value couldn't be loaded from the metadata, then the name of the audio file will be used.</remarks>
 	string TrackName { get; }
 
+	/// <summary>The id of the track that the audio file is linked to.</summary>
+	string? TrackId { get; }
+
 	/// <summary>The date that the track was released on.</summary>
 	DateInfo? TrackDate { get; }
 
 	/// <summary>The name of the album that the audio track belongs to.</summary>
-	string? Album { get; }
+	string? AlbumName { get; }
 
 	/// <summary>The date that the album was released on.</summary>
 	DateInfo? AlbumDate { get; }
 
 	/// <summary>The names of the artists that made the track.</summary>
-	IReadOnlyList<string> TrackArtists { get; }
+	ReadOnlyObservableCollection<string> TrackArtists { get; }
 
 	/// <summary>The names of the artists that made the album.</summary>
-	IReadOnlyList<string> AlbumArtists { get; }
+	ReadOnlyObservableCollection<string> AlbumArtists { get; }
 
 	/// <summary>The names of the genres that the track belongs to.</summary>
-	IReadOnlyList<string> TrackGenres { get; }
+	ReadOnlyObservableCollection<string> TrackGenres { get; }
 
 	/// <summary>The names of the genres that the album belongs to.</summary>
-	IReadOnlyList<string> AlbumGenres { get; }
+	ReadOnlyObservableCollection<string> AlbumGenres { get; }
 
-	/// <summary>The id of the track that the audio file is linked to.</summary>
-	string? TrackId { get; }
+	/// <summary>The duration of the audio file.</summary>
+	TimeSpan? Duration { get; }
+
+	/// <summary>The track number of the audio file.</summary>
+	int? TrackNumber { get; }
+
+	/// <summary>The total amount of tracks.</summary>
+	int? TotalTracks { get; }
+
+	/// <summary>The format of the container.</summary>
+	string? ContainerFormat { get; }
+
+	/// <summary>The format of the audio data.</summary>
+	string? AudioFormat { get; }
+
+	/// <summary>The format string to display.</summary>
+	string? DisplayFormat { get; }
+
+	/// <summary>The bit-rate of the audio data.</summary>
+	int? BitRate { get; }
+
+	/// <summary>The sample rate of the audio data.</summary>
+	int? SampleRate { get; }
+
+	/// <summary>The amount of channels in the audio date.</summary>
+	int? Channels { get; }
+
+	/// <summary>The fingerprint of the audio.</summary>
+	FingerprintInfo? Fingerprint { get; }
+
+	/// <summary>The id of the cover image.</summary>
+	string? CoverImageId { get; }
 	#endregion
 
 	#region Methods
@@ -61,5 +94,11 @@ public interface IAudioFileInfo : IDataModel<IAudioFileUpdate>
 	/// <returns>The track that the audio file is linked to, or <see langword="null"/> if the track didn't belong to an audio file.</returns>
 	/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
 	ValueTask<ITrackInfo?> GetTrackAsync(CancellationToken cancellation = default);
+
+	/// <summary>Gets the cover image that the audio file is linked to.</summary>
+	/// <param name="cancellation">A cancellation token that can be used to cancel the operation.</param>
+	/// <returns>The cover image that the audio file is linked to, or <see langword="null"/> if the audio file didn't have an image.</returns>
+	/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
+	ValueTask<IImageInfo?> GetCoverImageAsync(CancellationToken cancellation = default);
 	#endregion
 }
