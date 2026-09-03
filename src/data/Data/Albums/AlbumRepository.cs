@@ -89,12 +89,56 @@ internal sealed partial class AlbumRepository : JsonDataRepositoryBase<IAlbumInf
 	protected override JsonTypeInfo<AlbumJson> TypeInfo => AlbumJsonContext.Default.AlbumJson;
 	private JsonDataIndex<AlbumKey> AlbumKeyIndex { get; }
 	private ValueLock<AlbumKey> AlbumKeyLock { get; } = new();
+	private ValueLock<AlbumInfo> AlbumLock { get; } = new();
 	#endregion
 
 	#region Constructors
 	public AlbumRepository(IHushitData data, string baseDirectory) : base(data, baseDirectory)
 	{
 		AlbumKeyIndex = new(IndexDirectory, "by_name_and_artists", AlbumJsonContext.Default.DictionaryStringAlbumKey);
+	}
+	#endregion
+
+	#region Methods
+	public override void Initialise()
+	{
+		base.Initialise();
+		Data.Tracks.ModelUpdated.Subscribe(TrackUpdatedAsync);
+	}
+	#endregion
+
+	#region React methods
+	private async ValueTask TrackUpdatedAsync(ModelUpdateInfo<ITrackInfo, MutableTrack, TrackUpdate> update, CancellationToken cancellation)
+	{
+		if (update.Update.AlbumId.HasChanged)
+		{
+			AlbumInfo? oldAlbum = update.Old.AlbumId is null ? null : await TryGetCoreAsync(update.Old.AlbumId, cancellation).ConfigureAwait(false);
+			if (oldAlbum is not null)
+			{
+				await using (await AlbumLock.LockAsync(oldAlbum, cancellation).ConfigureAwait(false))
+				{
+					oldAlbum.TrackIds.Remove(update.Model.Id);
+					await SaveTrackBackReferencesAsync(oldAlbum, cancellation).ConfigureAwait(false);
+				}
+			}
+
+			AlbumInfo? newAlbum = update.New.AlbumId is null ? null : await TryGetCoreAsync(update.New.AlbumId, cancellation).ConfigureAwait(false);
+			if (newAlbum is not null)
+			{
+				await using (await AlbumLock.LockAsync(newAlbum, cancellation).ConfigureAwait(false))
+				{
+					newAlbum.TrackIds.Add(update.Model.Id);
+					await SaveTrackBackReferencesAsync(newAlbum, cancellation).ConfigureAwait(false);
+				}
+			}
+		}
+	}
+	#endregion
+
+	#region Backreference methods
+	private async ValueTask SaveTrackBackReferencesAsync(IAlbumInfo album, CancellationToken cancellation = default)
+	{
+		await SaveBackreferencesAsync(album.Id, TrackBackRefName, album.TrackIds, cancellation).ConfigureAwait(false);
 	}
 	#endregion
 

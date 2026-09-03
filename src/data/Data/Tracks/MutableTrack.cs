@@ -10,13 +10,10 @@ public sealed class MutableTrack : MutableDataModelBase<MutableTrack, TrackUpdat
 	public string? Name { get; set; }
 
 	/// <inheritdoc cref="ITrackInfo.Duration"/>
-	public TimeSpan? Duration { get; set; }
+	public TimeSpan Duration { get; set; }
 
 	/// <inheritdoc cref="ITrackInfo.AlbumId"/>
 	public string? AlbumId { get; set; }
-
-	/// <inheritdoc cref="ITrackInfo.AudioFileId"/>
-	public string? AudioFileId { get; set; }
 
 	/// <inheritdoc cref="IArtistReferencesInfo.ArtistIds"/>
 	public IList<string> ArtistIds { get; set; } = [];
@@ -32,15 +29,11 @@ public sealed class MutableTrack : MutableDataModelBase<MutableTrack, TrackUpdat
 		if (Name is null)
 			ThrowHelper.ThrowInvalidOperationException($"Expected the new '{nameof(Name)}' to have a value.");
 
-		if (Duration is null)
-			ThrowHelper.ThrowInvalidOperationException($"Expected the new '{nameof(Duration)}' to have a value.");
-
 		return new()
 		{
 			Name = Update.Value(oldState.Name, Name),
-			Duration = oldState.Duration is null ? Duration.Value : Update.Value(oldState.Duration, Duration),
+			Duration = Update.Value(oldState.Duration, Duration),
 			AlbumId = Update.Nullable(oldState.AlbumId, AlbumId),
-			AudioFileId = Update.Nullable(oldState.AudioFileId, AudioFileId),
 			ArtistIds = Update.List(oldState.ArtistIds, ArtistIds),
 			GenreIds = Update.List(oldState.GenreIds, GenreIds),
 		};

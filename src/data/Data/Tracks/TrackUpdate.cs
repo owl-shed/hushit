@@ -15,9 +15,6 @@ public sealed class TrackUpdate
 	/// <inheritdoc cref="ITrackInfo.AlbumId"/>
 	public NullableUpdate<string> AlbumId { get; set; }
 
-	/// <inheritdoc cref="ITrackInfo.AudioFileId"/>
-	public NullableUpdate<string> AudioFileId { get; set; }
-
 	/// <inheritdoc cref="IArtistReferencesInfo.ArtistIds"/>
 	public ListUpdate<string> ArtistIds { get; set; } = new();
 

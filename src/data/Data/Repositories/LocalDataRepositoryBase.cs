@@ -84,6 +84,22 @@ internal abstract class LocalDataRepositoryBase<TModel, TMutable, TUpdate, TType
 		Directory.CreateDirectory(directory);
 		await File.WriteAllLinesAsync(path, references, cancellation).ConfigureAwait(false);
 	}
+	protected virtual async ValueTask SaveBackreferenceAsync(string id, string kind, string? reference, CancellationToken cancellation = default)
+	{
+		cancellation.ThrowIfCancellationRequested();
+
+		if (reference is null)
+		{
+			await DeleteBackreferencesAsync(id, kind, cancellation).ConfigureAwait(false);
+			return;
+		}
+
+		string directory = GetBackreferenceDirectory(id);
+		string path = Path.Combine(directory, kind);
+
+		Directory.CreateDirectory(directory);
+		await File.WriteAllTextAsync(path, reference, cancellation).ConfigureAwait(false);
+	}
 	protected virtual async ValueTask<IReadOnlyList<string>> LoadBackreferencesAsync(string id, string kind, CancellationToken cancellation = default)
 	{
 		cancellation.ThrowIfCancellationRequested();
@@ -100,6 +116,24 @@ internal abstract class LocalDataRepositoryBase<TModel, TMutable, TUpdate, TType
 			.Select(static r => r.Trim())
 			.Where(r => string.IsNullOrWhiteSpace(r) is false)
 			.ToArray();
+	}
+	protected virtual async ValueTask<string?> LoadBackreferenceAsync(string id, string kind, CancellationToken cancellation = default)
+	{
+		cancellation.ThrowIfCancellationRequested();
+
+		string directory = GetBackreferenceDirectory(id);
+		string path = Path.Combine(directory, kind);
+
+		if (File.Exists(path) is false)
+			return null;
+
+		string reference = await File.ReadAllTextAsync(path, cancellation).ConfigureAwait(false);
+		reference = reference.Trim();
+
+		if (reference.IsWhiteSpace())
+			return null;
+
+		return reference;
 	}
 	protected virtual async ValueTask DeleteBackreferencesAsync(string id, string kind, CancellationToken cancellation = default)
 	{

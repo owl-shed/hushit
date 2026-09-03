@@ -28,6 +28,7 @@ internal sealed partial class ArtistRepository : JsonDataRepositoryBase<IArtistI
 	protected override JsonTypeInfo<ArtistJson> TypeInfo => ArtistJsonContext.Default.ArtistJson;
 	private JsonDataIndex<string> NameIndex { get; }
 	private ValueLock<string> NameLock { get; } = new();
+	private ValueLock<ArtistInfo> ArtistLock { get; } = new();
 	#endregion
 
 	#region Constructors
@@ -41,7 +42,9 @@ internal sealed partial class ArtistRepository : JsonDataRepositoryBase<IArtistI
 	public override void Initialise()
 	{
 		base.Initialise();
+
 		Data.Albums.ModelUpdated.Subscribe(AlbumUpdatedAsync);
+		Data.Tracks.ModelUpdated.Subscribe(TrackUpdatedAsync);
 	}
 	#endregion
 
@@ -56,8 +59,11 @@ internal sealed partial class ArtistRepository : JsonDataRepositoryBase<IArtistI
 			ArtistInfo? artist = await TryGetCoreAsync(id, cancellation).ConfigureAwait(false);
 			if (artist is not null)
 			{
-				artist.AlbumIds.Remove(update.Model.Id);
-				await SaveAlbumBackReferencesAsync(artist, cancellation).ConfigureAwait(false);
+				await using (await ArtistLock.LockAsync(artist, cancellation).ConfigureAwait(false))
+				{
+					artist.AlbumIds.Remove(update.Model.Id);
+					await SaveAlbumBackReferencesAsync(artist, cancellation).ConfigureAwait(false);
+				}
 			}
 		}
 
@@ -66,8 +72,42 @@ internal sealed partial class ArtistRepository : JsonDataRepositoryBase<IArtistI
 			ArtistInfo? artist = await TryGetCoreAsync(id, cancellation).ConfigureAwait(false);
 			if (artist is not null)
 			{
-				artist.AlbumIds.Add(update.Model.Id);
-				await SaveAlbumBackReferencesAsync(artist, cancellation).ConfigureAwait(false);
+				await using (await ArtistLock.LockAsync(artist, cancellation).ConfigureAwait(false))
+				{
+					artist.AlbumIds.Add(update.Model.Id);
+					await SaveAlbumBackReferencesAsync(artist, cancellation).ConfigureAwait(false);
+				}
+			}
+		}
+	}
+	private async ValueTask TrackUpdatedAsync(ModelUpdateInfo<ITrackInfo, MutableTrack, TrackUpdate> update, CancellationToken cancellation)
+	{
+		HashSet<string> removedArtists = update.Old.ArtistIds.Except(update.New.ArtistIds).ToHashSet();
+		HashSet<string> addedArtists = update.New.ArtistIds.Except(update.Old.ArtistIds).ToHashSet();
+
+		foreach (string id in removedArtists)
+		{
+			ArtistInfo? artist = await TryGetCoreAsync(id, cancellation).ConfigureAwait(false);
+			if (artist is not null)
+			{
+				await using (await ArtistLock.LockAsync(artist, cancellation).ConfigureAwait(false))
+				{
+					artist.TrackIds.Remove(update.Model.Id);
+					await SaveTrackBackReferencesAsync(artist, cancellation).ConfigureAwait(false);
+				}
+			}
+		}
+
+		foreach (string id in addedArtists)
+		{
+			ArtistInfo? artist = await TryGetCoreAsync(id, cancellation).ConfigureAwait(false);
+			if (artist is not null)
+			{
+				await using (await ArtistLock.LockAsync(artist, cancellation).ConfigureAwait(false))
+				{
+					artist.TrackIds.Add(update.Model.Id);
+					await SaveTrackBackReferencesAsync(artist, cancellation).ConfigureAwait(false);
+				}
 			}
 		}
 	}
@@ -77,6 +117,10 @@ internal sealed partial class ArtistRepository : JsonDataRepositoryBase<IArtistI
 	private async ValueTask SaveAlbumBackReferencesAsync(IArtistInfo artist, CancellationToken cancellation = default)
 	{
 		await SaveBackreferencesAsync(artist.Id, AlbumBackRefName, artist.AlbumIds, cancellation).ConfigureAwait(false);
+	}
+	private async ValueTask SaveTrackBackReferencesAsync(IArtistInfo artist, CancellationToken cancellation = default)
+	{
+		await SaveBackreferencesAsync(artist.Id, TrackBackRefName, artist.TrackIds, cancellation).ConfigureAwait(false);
 	}
 	#endregion
 

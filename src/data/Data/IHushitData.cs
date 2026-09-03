@@ -40,7 +40,7 @@ public sealed class HushitData : IHushitData
 	public IAlbumRepository Albums { get; }
 
 	/// <inheritdoc/>
-	public ITrackRepository Tracks => throw new NotImplementedException();
+	public ITrackRepository Tracks { get; }
 
 	/// <inheritdoc/>
 	public IGenreRepository Genres => throw new NotImplementedException();
@@ -66,10 +66,14 @@ public sealed class HushitData : IHushitData
 		string albumDirectory = Path.Combine(directory, "albums");
 		Albums = new AlbumRepository(this, albumDirectory);
 
+		string trackDirectory = Path.Combine(directory, "tracks");
+		Tracks = new TrackRepository(this, trackDirectory);
+
 		AudioFiles.Initialise();
 		Images.Initialise();
 		Artists.Initialise();
 		Albums.Initialise();
+		Tracks.Initialise();
 	}
 	#endregion
 }

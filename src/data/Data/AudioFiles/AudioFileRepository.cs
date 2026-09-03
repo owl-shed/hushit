@@ -183,10 +183,14 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 		IImageInfo? cover = await coverTask;
 		mutable.CoverImageId = cover?.Id;
 
+		List<string> trackArtistIds = [];
 		List<string> albumArtistIds = [];
 
 		foreach (string name in mutable.TrackArtists)
-			_ = await Data.Artists.GetOrCreateAsync(name, cancellation).ConfigureAwait(false);
+		{
+			IArtistInfo artist = await Data.Artists.GetOrCreateAsync(name, cancellation).ConfigureAwait(false);
+			trackArtistIds.Add(artist.Id);
+		}
 
 		foreach (string name in mutable.AlbumArtists)
 		{
@@ -194,13 +198,38 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 			albumArtistIds.Add(artist.Id);
 		}
 
+		string? albumId = null;
+
 		if (mutable.AlbumName is not null)
 		{
 			if (albumArtistIds.Count is 0)
 				Debug.WriteLine($"Audio file: {path} has an album name but no album artists!");
 
-			_ = await Data.Albums.GetOrCreateAsync(mutable.AlbumName, albumArtistIds, cancellation).ConfigureAwait(false);
+			IAlbumInfo album = await Data.Albums.GetOrCreateAsync(mutable.AlbumName, albumArtistIds, cancellation).ConfigureAwait(false);
+			albumId = album.Id;
 		}
+
+		void UpdateTrackCallback(MutableTrack track)
+		{
+			track.Name = mutable.TrackName;
+			track.Duration = mutable.Duration ?? TimeSpan.Zero;
+			track.AlbumId = albumId;
+			track.ArtistIds = trackArtistIds.ToArray();
+		}
+
+		ITrackInfo? track;
+		if (mutable.TrackId is not null)
+		{
+			track = await Data.Tracks.TryGetAsync(mutable.TrackId, cancellation).ConfigureAwait(false);
+			if (track is not null)
+			{
+				await Data.Tracks.UpdateAsync(track, UpdateTrackCallback, cancellation).ConfigureAwait(false);
+				return;
+			}
+		}
+
+		track = await Data.Tracks.CreateAsync(UpdateTrackCallback, cancellation).ConfigureAwait(false);
+		mutable.TrackId = track.Id;
 	}
 	#endregion
 
