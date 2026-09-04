@@ -8,15 +8,6 @@ public sealed class MutableGenre : MutableDataModelBase<MutableGenre, GenreUpdat
 	#region Properties
 	/// <inheritdoc cref="IGenreInfo.Name"/>
 	public string? Name { get; set; }
-
-	/// <inheritdoc cref="IArtistReferencesInfo.ArtistIds"/>
-	public IList<string> ArtistIds { get; set; } = [];
-
-	/// <inheritdoc cref="IAlbumReferencesInfo.AlbumIds"/>
-	public IList<string> AlbumIds { get; set; } = [];
-
-	/// <inheritdoc cref="ITrackReferencesInfo.TrackIds"/>
-	public IList<string> TrackIds { get; set; } = [];
 	#endregion
 
 	#region Update methods
@@ -29,9 +20,6 @@ public sealed class MutableGenre : MutableDataModelBase<MutableGenre, GenreUpdat
 		return new()
 		{
 			Name = Update.Value(oldState.Name, Name),
-			ArtistIds = Update.List(oldState.ArtistIds, ArtistIds),
-			AlbumIds = Update.List(oldState.AlbumIds, AlbumIds),
-			TrackIds = Update.List(oldState.TrackIds, TrackIds),
 		};
 	}
 	#endregion

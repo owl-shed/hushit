@@ -209,12 +209,21 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 			albumId = album.Id;
 		}
 
+		List<string> trackGenreIds = [];
+
+		foreach (string name in mutable.TrackGenres)
+		{
+			IGenreInfo genre = await Data.Genres.GetOrCreateAsync(name, cancellation).ConfigureAwait(false);
+			trackGenreIds.Add(genre.Id);
+		}
+
 		void UpdateTrackCallback(MutableTrack track)
 		{
 			track.Name = mutable.TrackName;
 			track.Duration = mutable.Duration ?? TimeSpan.Zero;
 			track.AlbumId = albumId;
 			track.ArtistIds = trackArtistIds.ToArray();
+			track.GenreIds = trackGenreIds.ToArray();
 		}
 
 		ITrackInfo? track;
