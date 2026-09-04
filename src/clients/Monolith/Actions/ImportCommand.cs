@@ -37,34 +37,28 @@ internal sealed class ImportCommand : Command
 
 			HushitData data = new(directory);
 
-			ParallelOptions options = new()
-			{
-				MaxDegreeOfParallelism = parse.GetValue(concurrencyOption),
-				CancellationToken = cancellation
-			};
-
 			string[] files = parse.GetRequiredValue(filesArgument);
-			bool force = parse.GetValue(forceOption);
+			bool force = parse.GetRequiredValue(forceOption);
 
 			if (files.Length is 1)
 				Console.Error.WriteLine($"Importing 1 audio file. Force = {force}.");
 			else
 				Console.Error.WriteLine($"Importing {files.Length:n0} audio files. Force = {force}.");
 
-
 			Stopwatch stopwatch = Stopwatch.StartNew();
-			await Parallel.ForEachAsync(files, options, async (file, cancellation) =>
+			ImportSettings settings = new()
 			{
-				Console.Error.WriteLine($"Importing {file}");
-				await data.AudioFiles.GetOrCreateAsync(file, force, cancellation).ConfigureAwait(false);
-			});
+				Concurrency = parse.GetRequiredValue(concurrencyOption),
+				Force = force
+			};
 
+			await data.ImportAsync(files, settings, cancellation).ConfigureAwait(false);
 			stopwatch.Stop();
 
 			if (stopwatch.Elapsed.TotalMinutes >= 1)
 				Console.WriteLine($"Imported the requested audio files in {(int)stopwatch.Elapsed.TotalMinutes:n0}m {stopwatch.Elapsed.Seconds}.{stopwatch.Elapsed.Milliseconds}s.");
 			else
-				Console.WriteLine($"Imported the requested audio files in {stopwatch.Elapsed.TotalSeconds}s.");
+				Console.WriteLine($"Imported the requested audio files in {stopwatch.Elapsed.TotalSeconds:n3}s.");
 		});
 	}
 	#endregion

@@ -28,33 +28,18 @@ internal sealed class ReloadCommand : Command
 
 			HushitData data = new(directory);
 
-			ParallelOptions options = new()
-			{
-				MaxDegreeOfParallelism = parse.GetValue(concurrencyOption),
-				CancellationToken = cancellation
-			};
-
-
 			Console.Error.WriteLine($"Reloading existing audio files.");
 
-			bool force = parse.GetValue(forceOption);
+			bool force = parse.GetRequiredValue(forceOption);
 
 			Stopwatch stopwatch = Stopwatch.StartNew();
-			await Parallel.ForEachAsync(data.AudioFiles.GetAllAsync(cancellation), options, async (file, cancellation) =>
+			ImportSettings settings = new()
 			{
-				if (force)
-				{
-					await file.ReloadAsync(cancellation).ConfigureAwait(false);
-					Console.Error.WriteLine($"forcefully reloaded #{file.Id} - {file.Path}");
-				}
-				else
-				{
-					bool changed = await file.TryReloadAsync(cancellation).ConfigureAwait(false);
-					if (changed)
-						Console.Error.WriteLine($"Reloaded #{file.Id} - {file.Path}");
-				}
-			});
+				Concurrency = parse.GetRequiredValue(concurrencyOption),
+				Force = force
+			};
 
+			await data.ReloadAsync(settings, cancellation).ConfigureAwait(false);
 			stopwatch.Stop();
 
 			if (stopwatch.Elapsed.Minutes >= 1)

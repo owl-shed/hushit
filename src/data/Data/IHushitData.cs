@@ -1,6 +1,20 @@
 namespace OwlShed.Hushit.Data;
 
 /// <summary>
+/// 	Represents the settings to use for importing new data.
+/// </summary>
+public sealed class ImportSettings
+{
+	#region Properties
+	/// <summary>The degree of concurrency to use when importing the audio files.</summary>
+	public int Concurrency { get; set; } = Environment.ProcessorCount;
+
+	/// <summary>Whether to forcefully reload the metadata if the audio file was already imported before.</summary>
+	public bool Force { get; set; } = false;
+	#endregion
+}
+
+/// <summary>
 /// 	Represents an access point to all of the data that Hushit stores and manages.
 /// </summary>
 public interface IHushitData
@@ -24,60 +38,53 @@ public interface IHushitData
 	/// <summary>The data repository for image file information.</summary>
 	IImageRepository Images { get; }
 	#endregion
+
+	#region Methods
+	/// <summary>Imports (or reloads) the given <paramref name="files"/> into the repositories.</summary>
+	/// <param name="files">The audio files to import.</param>
+	/// <param name="settings">The settings to use when importing the <paramref name="files"/>.</param>
+	/// <param name="cancellation">A cancellation token that can be used to cancel the operation.</param>
+	/// <returns>A task that represents the asynchronous operation.</returns>
+	/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
+	ValueTask ImportAsync(IReadOnlyCollection<string> files, ImportSettings settings, CancellationToken cancellation = default);
+
+	/// <summary>Reloads the imported audio files.</summary>
+	/// <param name="settings">The settings to use when reloading the audio files.</param>
+	/// <param name="cancellation">A cancellation token that can be used to cancel the operation.</param>
+	/// <returns>A task that represents the asynchronous operation.</returns>
+	/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
+	ValueTask ReloadAsync(ImportSettings settings, CancellationToken cancellation = default);
+	#endregion
 }
 
-/// <inheritdoc cref="IHushitData"/>
-public sealed class HushitData : IHushitData
+/// <summary>
+/// 	Contains various extensions related to the <see cref="IHushitData"/>.
+/// </summary>
+public static class IHushitDataExtensions
 {
-	#region Properties
-	/// <inheritdoc/>
-	public IAudioFileRepository AudioFiles { get; }
-
-	/// <inheritdoc/>
-	public IArtistRepository Artists { get; }
-
-	/// <inheritdoc/>
-	public IAlbumRepository Albums { get; }
-
-	/// <inheritdoc/>
-	public ITrackRepository Tracks { get; }
-
-	/// <inheritdoc/>
-	public IGenreRepository Genres { get; }
-
-	/// <inheritdoc/>
-	public IImageRepository Images { get; }
-	#endregion
-
-	#region Constructors
-	/// <summary>Creates a new <see cref="HushitData"/> instance.</summary>
-	/// <param name="directory">The base directory to store the Hushit data in.</param>
-	public HushitData(string directory)
+	extension(IHushitData data)
 	{
-		string audioFileDirectory = Path.Combine(directory, "audio_files");
-		AudioFiles = new AudioFileRepository(this, audioFileDirectory);
+		#region Methods
+		/// <summary>Imports (or reloads) the given <paramref name="files"/> into the repositories.</summary>
+		/// <param name="files">The audio files to import.</param>
+		/// <param name="cancellation">A cancellation token that can be used to cancel the operation.</param>
+		/// <returns>A task that represents the asynchronous operation.</returns>
+		/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
+		public async ValueTask ImportAsync(IReadOnlyCollection<string> files, CancellationToken cancellation = default)
+		{
+			ImportSettings settings = new();
+			await data.ImportAsync(files, settings, cancellation).ConfigureAwait(false);
+		}
 
-		string imageDirectory = Path.Combine(directory, "images");
-		Images = new ImageRepository(this, imageDirectory);
-
-		string artistDirectory = Path.Combine(directory, "artists");
-		Artists = new ArtistRepository(this, artistDirectory);
-
-		string albumDirectory = Path.Combine(directory, "albums");
-		Albums = new AlbumRepository(this, albumDirectory);
-
-		string trackDirectory = Path.Combine(directory, "tracks");
-		Tracks = new TrackRepository(this, trackDirectory);
-
-		string genreDirectory = Path.Combine(directory, "genres");
-		Genres = new GenreRepository(this, genreDirectory);
-
-		AudioFiles.Initialise();
-		Images.Initialise();
-		Artists.Initialise();
-		Albums.Initialise();
-		Tracks.Initialise();
-		Genres.Initialise();
+		/// <summary>Reloads the imported audio files.</summary>
+		/// <param name="cancellation">A cancellation token that can be used to cancel the operation.</param>
+		/// <returns>A task that represents the asynchronous operation.</returns>
+		/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
+		public async ValueTask ReloadAsync(CancellationToken cancellation = default)
+		{
+			ImportSettings settings = new();
+			await data.ReloadAsync(settings, cancellation).ConfigureAwait(false);
+		}
+		#endregion
 	}
-	#endregion
 }
