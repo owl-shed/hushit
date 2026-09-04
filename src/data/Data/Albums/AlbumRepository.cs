@@ -89,7 +89,6 @@ internal sealed partial class AlbumRepository : JsonDataRepositoryBase<IAlbumInf
 	protected override JsonTypeInfo<AlbumJson> TypeInfo => AlbumJsonContext.Default.AlbumJson;
 	private JsonDataIndex<AlbumKey> AlbumKeyIndex { get; }
 	private ValueLock<AlbumKey> AlbumKeyLock { get; } = new();
-	private ValueLock<AlbumInfo> AlbumLock { get; } = new();
 	#endregion
 
 	#region Constructors
@@ -115,7 +114,7 @@ internal sealed partial class AlbumRepository : JsonDataRepositoryBase<IAlbumInf
 			AlbumInfo? oldAlbum = update.Old.AlbumId is null ? null : await TryGetCoreAsync(update.Old.AlbumId, cancellation).ConfigureAwait(false);
 			if (oldAlbum is not null)
 			{
-				await using (await AlbumLock.LockAsync(oldAlbum, cancellation).ConfigureAwait(false))
+				await using (await LockAsync(oldAlbum, cancellation).ConfigureAwait(false))
 				{
 					oldAlbum.TrackIds.Remove(update.Model.Id);
 					await SaveTrackBackReferencesAsync(oldAlbum, cancellation).ConfigureAwait(false);
@@ -125,7 +124,7 @@ internal sealed partial class AlbumRepository : JsonDataRepositoryBase<IAlbumInf
 			AlbumInfo? newAlbum = update.New.AlbumId is null ? null : await TryGetCoreAsync(update.New.AlbumId, cancellation).ConfigureAwait(false);
 			if (newAlbum is not null)
 			{
-				await using (await AlbumLock.LockAsync(newAlbum, cancellation).ConfigureAwait(false))
+				await using (await LockAsync(newAlbum, cancellation).ConfigureAwait(false))
 				{
 					newAlbum.TrackIds.Add(update.Model.Id);
 					await SaveTrackBackReferencesAsync(newAlbum, cancellation).ConfigureAwait(false);

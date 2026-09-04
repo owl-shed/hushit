@@ -29,6 +29,8 @@ internal abstract class DataRepositoryBase<TModel, TMutable, TUpdate, TTypedMode
 
 	/// <inheritdoc/>
 	public IAsyncEvent<TModel> ModelRemoved => _modelRemoved;
+
+	protected ValueLock<TTypedModel> ModelLock { get; } = new();
 	#endregion
 
 	#region Constructors
@@ -91,18 +93,21 @@ internal abstract class DataRepositoryBase<TModel, TMutable, TUpdate, TTypedMode
 		cancellation.ThrowIfCancellationRequested();
 
 		TTypedModel model = Create(id, mutable);
-		Cache(model);
+		await using (await LockAsync(model, cancellation).ConfigureAwait(false))
+		{
+			Cache(model);
 
-		await PersistAsync(model, cancellation).ConfigureAwait(false);
+			await PersistAsync(model, cancellation).ConfigureAwait(false);
 
-		await OnCreatedAsync(model, cancellation).ConfigureAwait(false);
-		await _modelAdded.RaiseSequentialAsync(model, cancellation).ConfigureAwait(false);
+			await OnCreatedAsync(model, cancellation).ConfigureAwait(false);
+			await _modelAdded.RaiseSequentialAsync(model, cancellation).ConfigureAwait(false);
 
-		TMutable oldState = new();
-		TMutable newState = model.ToMutable();
-		TUpdate update = newState.GetUpdateFrom(oldState);
+			TMutable oldState = new();
+			TMutable newState = model.ToMutable();
+			TUpdate update = newState.GetUpdateFrom(oldState);
 
-		await _modelUpdated.RaiseSequentialAsync(new(ModelUpdateKind.Added, model, oldState, newState, update), cancellation).ConfigureAwait(false);
+			await _modelUpdated.RaiseSequentialAsync(new(ModelUpdateKind.Added, model, oldState, newState, update), cancellation).ConfigureAwait(false);
+		}
 
 		return model;
 	}
@@ -153,17 +158,20 @@ internal abstract class DataRepositoryBase<TModel, TMutable, TUpdate, TTypedMode
 		if (model?.Exists is not true)
 			ThrowHelper.ThrowArgumentException(nameof(id), $"The data model with the given id ({id}) no longer existed.");
 
-		TMutable oldState = model.ToMutable();
-		TMutable newState = model.ToMutable();
+		await using (await LockAsync(model, cancellation).ConfigureAwait(false))
+		{
+			TMutable oldState = model.ToMutable();
+			TMutable newState = model.ToMutable();
 
-		callback.Invoke(newState);
-		TUpdate update = newState.GetUpdateFrom(oldState);
+			callback.Invoke(newState);
+			TUpdate update = newState.GetUpdateFrom(oldState);
 
-		CopyState(model, oldState, newState, update);
-		await PersistAsync(model, cancellation).ConfigureAwait(false);
+			CopyState(model, oldState, newState, update);
+			await PersistAsync(model, cancellation).ConfigureAwait(false);
 
-		await OnUpdateAsync(model, oldState, newState, update, cancellation).ConfigureAwait(false);
-		await _modelUpdated.RaiseSequentialAsync(new(ModelUpdateKind.Changed, model, oldState, newState, update), cancellation).ConfigureAwait(false);
+			await OnUpdateAsync(model, oldState, newState, update, cancellation).ConfigureAwait(false);
+			await _modelUpdated.RaiseSequentialAsync(new(ModelUpdateKind.Changed, model, oldState, newState, update), cancellation).ConfigureAwait(false);
+		}
 
 		return true;
 	}
@@ -175,17 +183,20 @@ internal abstract class DataRepositoryBase<TModel, TMutable, TUpdate, TTypedMode
 		if (model?.Exists is not true)
 			ThrowHelper.ThrowArgumentException(nameof(id), $"The data model with the given id ({id}) no longer existed.");
 
-		TMutable oldState = model.ToMutable();
-		TMutable newState = model.ToMutable();
+		await using (await LockAsync(model, cancellation).ConfigureAwait(false))
+		{
+			TMutable oldState = model.ToMutable();
+			TMutable newState = model.ToMutable();
 
-		await callback.Invoke(newState, cancellation).ConfigureAwait(false);
-		TUpdate update = newState.GetUpdateFrom(oldState);
+			await callback.Invoke(newState, cancellation).ConfigureAwait(false);
+			TUpdate update = newState.GetUpdateFrom(oldState);
 
-		CopyState(model, oldState, newState, update);
-		await PersistAsync(model, cancellation).ConfigureAwait(false);
+			CopyState(model, oldState, newState, update);
+			await PersistAsync(model, cancellation).ConfigureAwait(false);
 
-		await OnUpdateAsync(model, oldState, newState, update, cancellation).ConfigureAwait(false);
-		await _modelUpdated.RaiseSequentialAsync(new(ModelUpdateKind.Changed, model, oldState, newState, update), cancellation).ConfigureAwait(false);
+			await OnUpdateAsync(model, oldState, newState, update, cancellation).ConfigureAwait(false);
+			await _modelUpdated.RaiseSequentialAsync(new(ModelUpdateKind.Changed, model, oldState, newState, update), cancellation).ConfigureAwait(false);
+		}
 
 		return true;
 	}
@@ -200,19 +211,22 @@ internal abstract class DataRepositoryBase<TModel, TMutable, TUpdate, TTypedMode
 		if (model is null)
 			return false;
 
-		MarkAsDeleted(model);
-		RemoveFromCache(id);
+		await using (await LockAsync(model, cancellation).ConfigureAwait(false))
+		{
+			MarkAsDeleted(model);
+			RemoveFromCache(id);
 
-		await StopPersistingAsync(id, cancellation);
+			await StopPersistingAsync(id, cancellation);
 
-		await OnRemovedAsync(model, cancellation).ConfigureAwait(false);
-		await _modelRemoved.RaiseSequentialAsync(model, cancellation).ConfigureAwait(false);
+			await OnRemovedAsync(model, cancellation).ConfigureAwait(false);
+			await _modelRemoved.RaiseSequentialAsync(model, cancellation).ConfigureAwait(false);
 
-		TMutable oldState = model.ToMutable();
-		TMutable newState = new();
-		TUpdate update = newState.GetUpdateFrom(oldState);
+			TMutable oldState = model.ToMutable();
+			TMutable newState = new();
+			TUpdate update = newState.GetUpdateFrom(oldState);
 
-		await _modelUpdated.RaiseSequentialAsync(new(ModelUpdateKind.Removed, model, oldState, newState, update), cancellation).ConfigureAwait(false);
+			await _modelUpdated.RaiseSequentialAsync(new(ModelUpdateKind.Removed, model, oldState, newState, update), cancellation).ConfigureAwait(false);
+		}
 
 		return true;
 	}
@@ -296,6 +310,10 @@ internal abstract class DataRepositoryBase<TModel, TMutable, TUpdate, TTypedMode
 	#endregion
 
 	#region Helpers
+	protected async ValueTask<IAsyncDisposable> LockAsync(TTypedModel model, CancellationToken cancellation = default)
+	{
+		return await ModelLock.LockAsync(model, cancellation).ConfigureAwait(false);
+	}
 	protected virtual string CreateNewId() => Guid.NewGuid().ToString("N");
 	protected abstract TTypedModel Create(string id, TMutable initialState);
 	protected abstract void MarkAsDeleted(TTypedModel model);

@@ -25,7 +25,6 @@ internal sealed partial class GenreRepository : JsonDataRepositoryBase<IGenreInf
 	protected override JsonTypeInfo<GenreJson> TypeInfo => GenreJsonContext.Default.GenreJson;
 	private JsonDataIndex<string> NameIndex { get; }
 	private ValueLock<string> NameLock { get; } = new();
-	private ValueLock<GenreInfo> GenreLock { get; } = new();
 	#endregion
 
 	#region Constructors
@@ -55,7 +54,7 @@ internal sealed partial class GenreRepository : JsonDataRepositoryBase<IGenreInf
 			GenreInfo? genre = await TryGetCoreAsync(id, cancellation).ConfigureAwait(false);
 			if (genre is not null)
 			{
-				await using (await GenreLock.LockAsync(genre, cancellation).ConfigureAwait(false))
+				await using (await LockAsync(genre, cancellation).ConfigureAwait(false))
 				{
 					genre.TrackIds.Remove(update.Model.Id);
 					await SaveTrackBackReferencesAsync(genre, cancellation).ConfigureAwait(false);
@@ -68,7 +67,7 @@ internal sealed partial class GenreRepository : JsonDataRepositoryBase<IGenreInf
 			GenreInfo? genre = await TryGetCoreAsync(id, cancellation).ConfigureAwait(false);
 			if (genre is not null)
 			{
-				await using (await GenreLock.LockAsync(genre, cancellation).ConfigureAwait(false))
+				await using (await LockAsync(genre, cancellation).ConfigureAwait(false))
 				{
 					genre.TrackIds.Add(update.Model.Id);
 					await SaveTrackBackReferencesAsync(genre, cancellation).ConfigureAwait(false);

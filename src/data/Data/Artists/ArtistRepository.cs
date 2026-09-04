@@ -28,7 +28,6 @@ internal sealed partial class ArtistRepository : JsonDataRepositoryBase<IArtistI
 	protected override JsonTypeInfo<ArtistJson> TypeInfo => ArtistJsonContext.Default.ArtistJson;
 	private JsonDataIndex<string> NameIndex { get; }
 	private ValueLock<string> NameLock { get; } = new();
-	private ValueLock<ArtistInfo> ArtistLock { get; } = new();
 	#endregion
 
 	#region Constructors
@@ -59,7 +58,7 @@ internal sealed partial class ArtistRepository : JsonDataRepositoryBase<IArtistI
 			ArtistInfo? artist = await TryGetCoreAsync(id, cancellation).ConfigureAwait(false);
 			if (artist is not null)
 			{
-				await using (await ArtistLock.LockAsync(artist, cancellation).ConfigureAwait(false))
+				await using (await LockAsync(artist, cancellation).ConfigureAwait(false))
 				{
 					artist.AlbumIds.Remove(update.Model.Id);
 					await SaveAlbumBackReferencesAsync(artist, cancellation).ConfigureAwait(false);
@@ -72,7 +71,7 @@ internal sealed partial class ArtistRepository : JsonDataRepositoryBase<IArtistI
 			ArtistInfo? artist = await TryGetCoreAsync(id, cancellation).ConfigureAwait(false);
 			if (artist is not null)
 			{
-				await using (await ArtistLock.LockAsync(artist, cancellation).ConfigureAwait(false))
+				await using (await LockAsync(artist, cancellation).ConfigureAwait(false))
 				{
 					artist.AlbumIds.Add(update.Model.Id);
 					await SaveAlbumBackReferencesAsync(artist, cancellation).ConfigureAwait(false);
@@ -90,7 +89,7 @@ internal sealed partial class ArtistRepository : JsonDataRepositoryBase<IArtistI
 			ArtistInfo? artist = await TryGetCoreAsync(id, cancellation).ConfigureAwait(false);
 			if (artist is not null)
 			{
-				await using (await ArtistLock.LockAsync(artist, cancellation).ConfigureAwait(false))
+				await using (await LockAsync(artist, cancellation).ConfigureAwait(false))
 				{
 					artist.TrackIds.Remove(update.Model.Id);
 					await SaveTrackBackReferencesAsync(artist, cancellation).ConfigureAwait(false);
@@ -103,7 +102,7 @@ internal sealed partial class ArtistRepository : JsonDataRepositoryBase<IArtistI
 			ArtistInfo? artist = await TryGetCoreAsync(id, cancellation).ConfigureAwait(false);
 			if (artist is not null)
 			{
-				await using (await ArtistLock.LockAsync(artist, cancellation).ConfigureAwait(false))
+				await using (await LockAsync(artist, cancellation).ConfigureAwait(false))
 				{
 					artist.TrackIds.Add(update.Model.Id);
 					await SaveTrackBackReferencesAsync(artist, cancellation).ConfigureAwait(false);

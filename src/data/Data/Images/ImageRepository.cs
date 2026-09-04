@@ -27,7 +27,6 @@ internal sealed partial class ImageRepository : JsonDataRepositoryBase<IImageInf
 	protected override JsonTypeInfo<ImageJson> TypeInfo => ImageJsonContext.Default.ImageJson;
 	private JsonDataIndex<string> HashIndex { get; }
 	private ValueLock<string> HashLock { get; } = new();
-	private ValueLock<ImageInfo> ImageLock { get; } = new();
 	#endregion
 
 	#region Constructors
@@ -53,7 +52,7 @@ internal sealed partial class ImageRepository : JsonDataRepositoryBase<IImageInf
 			ImageInfo? oldImage = await TryGetCoreAsync(update.Old.CoverImageId, cancellation).ConfigureAwait(false);
 			if (oldImage is not null)
 			{
-				await using (await ImageLock.LockAsync(oldImage, cancellation).ConfigureAwait(false))
+				await using (await LockAsync(oldImage, cancellation).ConfigureAwait(false))
 				{
 					oldImage.AudioFileIds.Remove(update.Model.Id);
 					await SaveAudioFileBackReferencesAsync(oldImage, cancellation).ConfigureAwait(false);
@@ -63,7 +62,7 @@ internal sealed partial class ImageRepository : JsonDataRepositoryBase<IImageInf
 			ImageInfo? newImage = await TryGetCoreAsync(update.New.CoverImageId, cancellation).ConfigureAwait(false);
 			if (newImage is not null)
 			{
-				await using (await ImageLock.LockAsync(newImage, cancellation).ConfigureAwait(false))
+				await using (await LockAsync(newImage, cancellation).ConfigureAwait(false))
 				{
 					newImage.AudioFileIds.Add(update.Model.Id);
 					await SaveAudioFileBackReferencesAsync(newImage, cancellation).ConfigureAwait(false);

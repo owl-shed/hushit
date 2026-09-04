@@ -34,7 +34,6 @@ internal sealed partial class TrackRepository : JsonDataRepositoryBase<ITrackInf
 
 	#region Properties
 	protected override JsonTypeInfo<TrackJson> TypeInfo => TrackJsonContext.Default.TrackJson;
-	private ValueLock<TrackInfo> TrackLock { get; } = new();
 	#endregion
 
 	#region Constructors
@@ -59,7 +58,7 @@ internal sealed partial class TrackRepository : JsonDataRepositoryBase<ITrackInf
 			TrackInfo? oldTrack = update.Old.TrackId is null ? null : await TryGetCoreAsync(update.Old.TrackId, cancellation).ConfigureAwait(false);
 			if (oldTrack is not null)
 			{
-				await using (await TrackLock.LockAsync(oldTrack, cancellation).ConfigureAwait(false))
+				await using (await LockAsync(oldTrack, cancellation).ConfigureAwait(false))
 				{
 					oldTrack.AudioFileId = update.Model.Id;
 					await SaveAudioFileBackReferenceAsync(oldTrack, cancellation).ConfigureAwait(false);
@@ -69,7 +68,7 @@ internal sealed partial class TrackRepository : JsonDataRepositoryBase<ITrackInf
 			TrackInfo? newTrack = update.New.TrackId is null ? null : await TryGetCoreAsync(update.New.TrackId, cancellation).ConfigureAwait(false);
 			if (newTrack is not null)
 			{
-				await using (await TrackLock.LockAsync(newTrack, cancellation).ConfigureAwait(false))
+				await using (await LockAsync(newTrack, cancellation).ConfigureAwait(false))
 				{
 					newTrack.AudioFileId = update.Model.Id;
 					await SaveAudioFileBackReferenceAsync(newTrack, cancellation).ConfigureAwait(false);
