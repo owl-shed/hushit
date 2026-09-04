@@ -5,6 +5,7 @@ global using System.IO;
 
 global using Microsoft.Extensions.Hosting;
 
+global using OwlShed.Hushit.Common;
 global using OwlShed.Hushit.Data;
 global using OwlShed.Hushit.Monolith.Actions;
 global using OwlShed.Hushit.Monolith.Actions.Meta;

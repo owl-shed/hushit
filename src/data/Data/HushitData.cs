@@ -5,6 +5,47 @@ namespace OwlShed.Hushit.Data;
 /// <inheritdoc cref="IHushitData"/>
 public sealed class HushitData : IHushitData
 {
+	#region Nested types
+	private sealed class ProgressInfo(ImportProgress progress, IProgress<ImportProgress>? reporter)
+	{
+		#region Properties
+		public ImportProgress Progress { get; } = progress;
+		public IProgress<ImportProgress>? Reporter { get; } = reporter;
+		#endregion
+
+		#region Constructors
+		public ProgressInfo(IProgress<ImportProgress>? reporter) : this(new(), reporter) { }
+		#endregion
+
+		#region Methods
+		public void NewStage(ImportStage stage, int totalSteps)
+		{
+			Progress.NewStage(stage, totalSteps);
+			Report();
+		}
+		public void AddMessage(string message)
+		{
+			Progress.AddMessage(message);
+			Report();
+		}
+		public void AddWarning(string message)
+		{
+			Progress.AddWarning(message);
+			Report();
+		}
+		public void Increment()
+		{
+			Progress.IncrementStep();
+			Report();
+		}
+		#endregion
+
+		#region Helpers
+		private void Report() => Reporter?.Report(Progress);
+		#endregion
+	}
+	#endregion
+
 	#region Properties
 	/// <inheritdoc/>
 	public IAudioFileRepository AudioFiles { get; }
@@ -67,16 +108,22 @@ public sealed class HushitData : IHushitData
 			CancellationToken = cancellation
 		};
 
+		ProgressInfo progress = new(settings.Progress);
+
+		progress.NewStage(ImportStage.AudioFiles, files.Count);
+
 		ConcurrentBag<IAudioFileInfo> audioFiles = [];
 		await Parallel.ForEachAsync(files, options, async (file, cancellation) =>
 		{
-			Debug.WriteLine($"Importing audio file: {file}");
+			progress.AddMessage($"Importing audio file: {file}");
+			progress.Increment();
+
 			IAudioFileInfo audioFile = await AudioFiles.GetOrCreateAsync(file, force: settings.Force, cancellation).ConfigureAwait(false);
 			audioFiles.Add(audioFile);
 
 		}).ConfigureAwait(false);
 
-		await UpdateFromFilesAsync(audioFiles, settings, cancellation).ConfigureAwait(false);
+		await UpdateFromFilesAsync(audioFiles, settings, progress, cancellation).ConfigureAwait(false);
 	}
 
 	/// <inheritdoc/>
@@ -88,10 +135,17 @@ public sealed class HushitData : IHushitData
 			CancellationToken = cancellation
 		};
 
+		ProgressInfo progress = new(settings.Progress);
+
+		IAudioFileInfo[] allFiles = await AudioFiles.GetAllAsync(cancellation).ToArrayAsync(cancellation).ConfigureAwait(false);
+		progress.NewStage(ImportStage.AudioFiles, allFiles.Length);
+
 		ConcurrentBag<IAudioFileInfo> audioFiles = [];
-		await Parallel.ForEachAsync(AudioFiles.GetAllAsync(cancellation), options, async (file, cancellation) =>
+		await Parallel.ForEachAsync(allFiles, options, async (file, cancellation) =>
 		{
-			Debug.WriteLine($"Reloading audio file: {file}");
+			progress.AddMessage($"Reloading audio file: {file}");
+			progress.Increment();
+
 			bool changed = settings.Force switch
 			{
 				true => await file.ReloadAsync(cancellation).ConfigureAwait(false),
@@ -103,10 +157,13 @@ public sealed class HushitData : IHushitData
 
 		}).ConfigureAwait(false);
 
-		await UpdateFromFilesAsync(audioFiles, settings, cancellation).ConfigureAwait(false);
+		await UpdateFromFilesAsync(audioFiles, settings, progress, cancellation).ConfigureAwait(false);
 	}
 
-	private async ValueTask UpdateFromFilesAsync(IReadOnlyCollection<IAudioFileInfo> files, ImportSettings settings, CancellationToken cancellation = default)
+	private async ValueTask UpdateFromFilesAsync(
+		IReadOnlyCollection<IAudioFileInfo> files,
+		ImportSettings settings, ProgressInfo progress,
+		CancellationToken cancellation = default)
 	{
 		ParallelOptions options = new()
 		{
@@ -115,24 +172,32 @@ public sealed class HushitData : IHushitData
 		};
 
 		string[] genreNames = files.SelectMany(file => file.TrackGenres.Concat(file.AlbumGenres)).Distinct().ToArray();
+		progress.NewStage(ImportStage.Genres, genreNames.Length);
+
 		await Parallel.ForEachAsync(genreNames, options, async (name, cancellation) =>
 		{
-			Debug.WriteLine($"Checking genre: {name}");
+			progress.AddMessage($"Checking genre: '{name}'");
+			progress.Increment();
+
 			await Genres.GetOrCreateAsync(name, cancellation).ConfigureAwait(false);
 		}
 		).ConfigureAwait(false);
 
 		string[] artistNames = files.SelectMany(file => file.TrackArtists.Concat(file.AlbumArtists)).Distinct().ToArray();
+		progress.NewStage(ImportStage.Artists, artistNames.Length);
+
 		await Parallel.ForEachAsync(artistNames, options, async (name, cancellation) =>
 		{
-			Debug.WriteLine($"Checking artist: {name}");
+			progress.AddMessage($"Checking artist: '{name}'");
+			progress.Increment();
+
 			await Artists.GetOrCreateAsync(name, cancellation).ConfigureAwait(false);
 		}).ConfigureAwait(false);
 
 		HashSet<AlbumKey> albumKeys = [];
 		await Parallel.ForEachAsync(files, options, async (file, cancellation) =>
 		{
-			AlbumKey? key = await GetAlbumKeyAsync(file, cancellation).ConfigureAwait(false);
+			AlbumKey? key = await GetAlbumKeyAsync(file, progress, cancellation).ConfigureAwait(false);
 			if (key is null)
 				return;
 
@@ -141,16 +206,22 @@ public sealed class HushitData : IHushitData
 
 		}).ConfigureAwait(false);
 
+		progress.NewStage(ImportStage.Albums, albumKeys.Count);
 		await Parallel.ForEachAsync(albumKeys, options, async (album, cancellation) =>
 		{
-			Debug.WriteLine($"Checking album: {album.Name}");
+			progress.AddMessage($"Checking artist: '{album.Name}'");
+			progress.Increment();
+
 			await Albums.GetOrCreateAsync(album.Name, album.ArtistIds, cancellation).ConfigureAwait(false);
 		}).ConfigureAwait(false);
 
+		progress.NewStage(ImportStage.Tracks, files.Count);
 		await Parallel.ForEachAsync(files, options, async (file, cancellation) =>
 		{
-			Debug.WriteLine($"Checking track for: {file.Path}");
-			AlbumKey? albumKey = await GetAlbumKeyAsync(file, cancellation).ConfigureAwait(false);
+			progress.AddMessage($"Checking track for: '{file.Path}'");
+			progress.Increment();
+
+			AlbumKey? albumKey = await GetAlbumKeyAsync(file, null, cancellation).ConfigureAwait(false);
 			IAlbumInfo? album = albumKey is null ? null : await Albums.GetOrCreateAsync(albumKey.Name, albumKey.ArtistIds, cancellation).ConfigureAwait(false);
 
 			List<string> trackArtistIds = [];
@@ -196,19 +267,19 @@ public sealed class HushitData : IHushitData
 	#endregion
 
 	#region Helpers
-	private async ValueTask<AlbumKey?> GetAlbumKeyAsync(IAudioFileInfo file, CancellationToken cancellation = default)
+	private async ValueTask<AlbumKey?> GetAlbumKeyAsync(IAudioFileInfo file, ProgressInfo? progress, CancellationToken cancellation = default)
 	{
 		if (file.AlbumName is null)
 		{
 			if (file.AlbumArtists.Any())
-				Debug.WriteLine($"Audio file '{file.Path}' has album artists but no album name!");
+				progress?.AddWarning($"Audio file '{file.Path}' has album artists but no album name!");
 
 			return null;
 		}
 
 		if (file.AlbumArtists.Count is 0)
 		{
-			Debug.WriteLine($"Audio file '{file.Path}' had an album name but no album artists.");
+			progress?.AddWarning($"Audio file '{file.Path}' has an album name but no album artists.");
 			return null;
 		}
 

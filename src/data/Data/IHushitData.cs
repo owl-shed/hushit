@@ -11,6 +11,9 @@ public sealed class ImportSettings
 
 	/// <summary>Whether to forcefully reload the metadata if the audio file was already imported before.</summary>
 	public bool Force { get; set; } = false;
+
+	/// <summary>The <see cref="IProgress{T}"/> instance used to report import progress changes.</summary>
+	public IProgress<ImportProgress>? Progress { get; set; }
 	#endregion
 }
 

@@ -38,27 +38,10 @@ internal sealed class ImportCommand : Command
 			HushitData data = new(directory);
 
 			string[] files = parse.GetRequiredValue(filesArgument);
+			int concurrency = parse.GetRequiredValue(concurrencyOption);
 			bool force = parse.GetRequiredValue(forceOption);
 
-			if (files.Length is 1)
-				Console.Error.WriteLine($"Importing 1 audio file. Force = {force}.");
-			else
-				Console.Error.WriteLine($"Importing {files.Length:n0} audio files. Force = {force}.");
-
-			Stopwatch stopwatch = Stopwatch.StartNew();
-			ImportSettings settings = new()
-			{
-				Concurrency = parse.GetRequiredValue(concurrencyOption),
-				Force = force
-			};
-
-			await data.ImportAsync(files, settings, cancellation).ConfigureAwait(false);
-			stopwatch.Stop();
-
-			if (stopwatch.Elapsed.TotalMinutes >= 1)
-				Console.WriteLine($"Imported the requested audio files in {(int)stopwatch.Elapsed.TotalMinutes:n0}m {stopwatch.Elapsed.Seconds}.{stopwatch.Elapsed.Milliseconds}s.");
-			else
-				Console.WriteLine($"Imported the requested audio files in {stopwatch.Elapsed.TotalSeconds:n3}s.");
+			await ImportHelper.ImportAsync(data, files, concurrency, force, cancellation).ConfigureAwait(false);
 		});
 	}
 	#endregion

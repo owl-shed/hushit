@@ -28,24 +28,10 @@ internal sealed class ReloadCommand : Command
 
 			HushitData data = new(directory);
 
-			Console.Error.WriteLine($"Reloading existing audio files.");
-
+			int concurrency = parse.GetRequiredValue(concurrencyOption);
 			bool force = parse.GetRequiredValue(forceOption);
 
-			Stopwatch stopwatch = Stopwatch.StartNew();
-			ImportSettings settings = new()
-			{
-				Concurrency = parse.GetRequiredValue(concurrencyOption),
-				Force = force
-			};
-
-			await data.ReloadAsync(settings, cancellation).ConfigureAwait(false);
-			stopwatch.Stop();
-
-			if (stopwatch.Elapsed.Minutes >= 1)
-				Console.WriteLine($"Reloaded the audio files in {(int)stopwatch.Elapsed.TotalMinutes:n0}m {stopwatch.Elapsed.Seconds}.{stopwatch.Elapsed.Milliseconds}s.");
-			else
-				Console.WriteLine($"Reloaded the audio files in {stopwatch.Elapsed.TotalSeconds:n3}s.");
+			await ImportHelper.ReloadAsync(data, concurrency, force, cancellation).ConfigureAwait(false);
 		});
 	}
 	#endregion
