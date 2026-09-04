@@ -56,7 +56,11 @@ internal abstract class DataRepositoryBase<TModel, TMutable, TUpdate, TTypedMode
 	{
 		cancellation.ThrowIfCancellationRequested();
 
-		TMutable mutable = new();
+		TMutable mutable = new()
+		{
+			AddedOn = DateTimeOffset.Now,
+			ModifiedOn = DateTimeOffset.Now
+		};
 		await callback.Invoke(mutable, cancellation).ConfigureAwait(false);
 
 		TTypedModel model = Create(id, mutable);
@@ -88,7 +92,12 @@ internal abstract class DataRepositoryBase<TModel, TMutable, TUpdate, TTypedMode
 	{
 		cancellation.ThrowIfCancellationRequested();
 
-		TMutable mutable = new();
+		TMutable mutable = new()
+		{
+			AddedOn = DateTimeOffset.Now,
+			ModifiedOn = DateTimeOffset.Now
+		};
+
 		callback.Invoke(mutable);
 		cancellation.ThrowIfCancellationRequested();
 
@@ -162,6 +171,7 @@ internal abstract class DataRepositoryBase<TModel, TMutable, TUpdate, TTypedMode
 		{
 			TMutable oldState = model.ToMutable();
 			TMutable newState = model.ToMutable();
+			newState.ModifiedOn = DateTimeOffset.Now;
 
 			callback.Invoke(newState);
 			TUpdate update = newState.GetUpdateFrom(oldState);
@@ -187,6 +197,7 @@ internal abstract class DataRepositoryBase<TModel, TMutable, TUpdate, TTypedMode
 		{
 			TMutable oldState = model.ToMutable();
 			TMutable newState = model.ToMutable();
+			newState.ModifiedOn = DateTimeOffset.Now;
 
 			await callback.Invoke(newState, cancellation).ConfigureAwait(false);
 			TUpdate update = newState.GetUpdateFrom(oldState);

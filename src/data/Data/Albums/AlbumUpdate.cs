@@ -3,7 +3,7 @@ namespace OwlShed.Hushit.Data.Albums;
 /// <summary>
 /// 	Represents an update to the <see cref="IAlbumInfo"/>.
 /// </summary>
-public sealed class AlbumUpdate
+public sealed class AlbumUpdate : DataModelUpdateBase
 {
 	#region Properties
 	/// <inheritdoc cref="IAlbumInfo.Name"/>

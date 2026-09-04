@@ -6,7 +6,7 @@ internal sealed partial class GenreRepository : JsonDataRepositoryBase<IGenreInf
 	[JsonSourceGenerationOptions(WriteIndented = true, PropertyNamingPolicy = JsonKnownNamingPolicy.SnakeCaseLower)]
 	[JsonSerializable(typeof(GenreJson))]
 	private sealed partial class GenreJsonContext : JsonSerializerContext { }
-	internal sealed class GenreJson
+	internal sealed class GenreJson : DataModelJson
 	{
 		#region Properties
 		[JsonPropertyName("name")]
@@ -154,6 +154,8 @@ internal sealed partial class GenreRepository : JsonDataRepositoryBase<IGenreInf
 
 		return new()
 		{
+			AddedOn = mutable.AddedOn,
+			ModifiedOn = mutable.ModifiedOn,
 			Name = mutable.Name,
 		};
 	}
@@ -161,6 +163,8 @@ internal sealed partial class GenreRepository : JsonDataRepositoryBase<IGenreInf
 	{
 		return new()
 		{
+			AddedOn = json.AddedOn,
+			ModifiedOn = json.ModifiedOn,
 			Name = json.Name
 		};
 	}

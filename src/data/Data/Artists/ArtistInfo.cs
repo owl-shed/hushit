@@ -35,14 +35,8 @@ internal sealed class ArtistInfo : DataModelBase<IArtistInfo, MutableArtist, Art
 	#endregion
 
 	#region Constructors
-	public ArtistInfo(IHushitData data, string id, string name) : base(data, id)
+	public ArtistInfo(IHushitData data, string id, MutableArtist initialState) : base(data, id, initialState)
 	{
-		Name = name;
-	}
-	public ArtistInfo(IHushitData data, string id, MutableArtist initialState) : base(data, id)
-	{
-		CopyState(initialState);
-
 		Debug.Assert(Name is not null);
 	}
 	#endregion
@@ -55,6 +49,8 @@ internal sealed class ArtistInfo : DataModelBase<IArtistInfo, MutableArtist, Art
 	{
 		return new()
 		{
+			AddedOn = AddedOn,
+			ModifiedOn = ModifiedOn,
 			Name = Name,
 			Aliases = [.. Aliases],
 		};
@@ -66,6 +62,8 @@ internal sealed class ArtistInfo : DataModelBase<IArtistInfo, MutableArtist, Art
 		if (state.Name is null)
 			ThrowHelper.ThrowArgumentException(nameof(state), $"Expected the new state to have a name.");
 
+		AddedOn = state.AddedOn;
+		ModifiedOn = state.ModifiedOn;
 		Name = state.Name;
 		_aliases.Replace(state.Aliases);
 	}

@@ -6,7 +6,7 @@ internal sealed partial class ImageRepository : JsonDataRepositoryBase<IImageInf
 	[JsonSourceGenerationOptions(WriteIndented = true, PropertyNamingPolicy = JsonKnownNamingPolicy.SnakeCaseLower)]
 	[JsonSerializable(typeof(ImageJson))]
 	private sealed partial class ImageJsonContext : JsonSerializerContext { }
-	internal sealed class ImageJson
+	internal sealed class ImageJson : DataModelJson
 	{
 		#region Properties
 		[JsonPropertyName("path")]
@@ -154,6 +154,8 @@ internal sealed partial class ImageRepository : JsonDataRepositoryBase<IImageInf
 
 		return new()
 		{
+			AddedOn = mutable.AddedOn,
+			ModifiedOn = mutable.ModifiedOn,
 			Path = mutable.Path,
 			Hash = mutable.Hash.Value.ToString(),
 		};
@@ -162,6 +164,8 @@ internal sealed partial class ImageRepository : JsonDataRepositoryBase<IImageInf
 	{
 		return new()
 		{
+			AddedOn = json.AddedOn,
+			ModifiedOn = json.ModifiedOn,
 			Path = json.Path,
 			Hash = HashInfo.TryParse(json.Hash)
 		};

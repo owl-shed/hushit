@@ -7,7 +7,7 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 	[JsonSerializable(typeof(AudioFileJson))]
 	[JsonSerializable(typeof(string[]))]
 	private sealed partial class AudioFileJsonContext : JsonSerializerContext { }
-	internal sealed class AudioFileJson
+	internal sealed class AudioFileJson : DataModelJson
 	{
 		#region Properties
 		[JsonPropertyName("path")]
@@ -201,6 +201,8 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 
 		return new()
 		{
+			AddedOn = mutable.AddedOn,
+			ModifiedOn = mutable.ModifiedOn,
 			Path = mutable.Path,
 			Hash = mutable.Hash.Value.ToString(),
 			TrackName = mutable.TrackName,
@@ -229,6 +231,8 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 	{
 		return new()
 		{
+			AddedOn = json.AddedOn,
+			ModifiedOn = json.ModifiedOn,
 			Path = json.Path,
 			Hash = HashInfo.TryParse(json.Hash),
 			TrackName = json.TrackName,

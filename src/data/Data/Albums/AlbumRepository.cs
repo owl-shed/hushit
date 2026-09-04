@@ -8,7 +8,7 @@ internal sealed partial class AlbumRepository : JsonDataRepositoryBase<IAlbumInf
 	[JsonSerializable(typeof(AlbumKey))]
 	[JsonSerializable(typeof(Dictionary<string, AlbumKey>))]
 	private sealed partial class AlbumJsonContext : JsonSerializerContext { }
-	internal sealed class AlbumJson
+	internal sealed class AlbumJson : DataModelJson
 	{
 		#region Properties
 		[JsonPropertyName("name")]
@@ -155,6 +155,8 @@ internal sealed partial class AlbumRepository : JsonDataRepositoryBase<IAlbumInf
 
 		return new()
 		{
+			AddedOn = mutable.AddedOn,
+			ModifiedOn = mutable.ModifiedOn,
 			Name = mutable.Name,
 			ArtistIds = mutable.ArtistIds.ToArray()
 		};
@@ -163,6 +165,8 @@ internal sealed partial class AlbumRepository : JsonDataRepositoryBase<IAlbumInf
 	{
 		return new()
 		{
+			AddedOn = json.AddedOn,
+			ModifiedOn = json.ModifiedOn,
 			Name = json.Name,
 			ArtistIds = json.ArtistIds,
 		};

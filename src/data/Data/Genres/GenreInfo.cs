@@ -27,14 +27,8 @@ internal sealed class GenreInfo : DataModelBase<IGenreInfo, MutableGenre, GenreU
 	#endregion
 
 	#region Constructors
-	public GenreInfo(IHushitData data, string id, string name) : base(data, id)
+	public GenreInfo(IHushitData data, string id, MutableGenre initialState) : base(data, id, initialState)
 	{
-		Name = name;
-	}
-	public GenreInfo(IHushitData data, string id, MutableGenre initialState) : base(data, id)
-	{
-		CopyState(initialState);
-
 		Debug.Assert(Name is not null);
 	}
 	#endregion
@@ -47,6 +41,8 @@ internal sealed class GenreInfo : DataModelBase<IGenreInfo, MutableGenre, GenreU
 	{
 		return new()
 		{
+			AddedOn = AddedOn,
+			ModifiedOn = ModifiedOn,
 			Name = Name
 		};
 	}
@@ -57,6 +53,8 @@ internal sealed class GenreInfo : DataModelBase<IGenreInfo, MutableGenre, GenreU
 		if (state.Name is null)
 			ThrowHelper.ThrowArgumentException(nameof(state), $"Expected the new state to have a name.");
 
+		AddedOn = state.AddedOn;
+		ModifiedOn = state.ModifiedOn;
 		Name = state.Name;
 	}
 	#endregion

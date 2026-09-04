@@ -32,19 +32,13 @@ internal sealed class TrackInfo : DataModelBase<ITrackInfo, MutableTrack, TrackU
 	#endregion
 
 	#region Constructors
-	public TrackInfo(IHushitData data, string id, string name, TimeSpan duration) : base(data, id)
-	{
-		Name = name;
-		Duration = duration;
-	}
-	public TrackInfo(IHushitData data, string id, MutableTrack initialState) : base(data, id)
+	public TrackInfo(IHushitData data, string id, MutableTrack initialState) : base(data, id, initialState)
 	{
 		CopyState(initialState);
 
 		Debug.Assert(Name is not null);
 	}
 	#endregion
-
 
 	#region Methods
 	/// <inheritdoc/>

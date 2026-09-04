@@ -3,8 +3,7 @@ namespace OwlShed.Hushit.Data.Images;
 /// <summary>
 /// 	Represents an update to the <see cref="IImageInfo"/>.
 /// </summary>
-
-public sealed class ImageUpdate
+public sealed class ImageUpdate : DataModelUpdateBase
 {
 	#region Properties
 	/// <inheritdoc cref="IImageInfo.Path"/>

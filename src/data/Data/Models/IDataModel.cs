@@ -11,6 +11,12 @@ public interface IDataModel : INotifyPropertyChanged
 
 	/// <summary>whether the model still exists in the repository.</summary>
 	bool Exists { get; }
+
+	/// <summary>The date and time that the data model was added to the repository on.</summary>
+	DateTimeOffset AddedOn { get; }
+
+	/// <summary>The data nad time that the data model was last modified on.</summary>
+	DateTimeOffset ModifiedOn { get; }
 	#endregion
 
 	#region Methods

@@ -31,6 +31,8 @@ public sealed class MutableTrack : MutableDataModelBase<MutableTrack, TrackUpdat
 
 		return new()
 		{
+			AddedOn = Update.Value(oldState.AddedOn, AddedOn),
+			ModifiedOn = Update.Value(oldState.ModifiedOn, ModifiedOn),
 			Name = Update.Value(oldState.Name, Name),
 			Duration = Update.Value(oldState.Duration, Duration),
 			AlbumId = Update.Nullable(oldState.AlbumId, AlbumId),

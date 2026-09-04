@@ -3,7 +3,7 @@ namespace OwlShed.Hushit.Data.Tracks;
 /// <summary>
 /// 	Represents an update to the <see cref="ITrackInfo"/>.
 /// </summary>
-public sealed class TrackUpdate
+public sealed class TrackUpdate : DataModelUpdateBase
 {
 	#region Properties
 	/// <inheritdoc cref="ITrackInfo.Name"/>

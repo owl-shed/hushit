@@ -3,7 +3,7 @@ namespace OwlShed.Hushit.Data.AudioFiles;
 /// <summary>
 /// 	Represents an update to the <see cref="IAudioFileInfo"/>.
 /// </summary>
-public sealed class AudioFileUpdate
+public sealed class AudioFileUpdate : DataModelUpdateBase
 {
 	#region Properties
 	/// <inheritdoc cref="IAudioFileInfo.Path"/>

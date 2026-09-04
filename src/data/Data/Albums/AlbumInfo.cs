@@ -30,14 +30,8 @@ internal sealed class AlbumInfo : DataModelBase<IAlbumInfo, MutableAlbum, AlbumU
 	#endregion
 
 	#region Constructors
-	public AlbumInfo(IHushitData data, string id, string name) : base(data, id)
+	public AlbumInfo(IHushitData data, string id, MutableAlbum initialState) : base(data, id, initialState)
 	{
-		Name = name;
-	}
-	public AlbumInfo(IHushitData data, string id, MutableAlbum initialState) : base(data, id)
-	{
-		CopyState(initialState);
-
 		Debug.Assert(Name is not null);
 	}
 	#endregion
@@ -49,6 +43,8 @@ internal sealed class AlbumInfo : DataModelBase<IAlbumInfo, MutableAlbum, AlbumU
 	{
 		return new()
 		{
+			AddedOn = AddedOn,
+			ModifiedOn = ModifiedOn,
 			Name = Name,
 			ArtistIds = [.. _artistIds]
 		};
@@ -60,6 +56,8 @@ internal sealed class AlbumInfo : DataModelBase<IAlbumInfo, MutableAlbum, AlbumU
 		if (state.Name is null)
 			ThrowHelper.ThrowArgumentException(nameof(state), $"Expected the new state to have a name.");
 
+		AddedOn = state.AddedOn;
+		ModifiedOn = state.ModifiedOn;
 		Name = state.Name;
 		_artistIds.Replace(state.ArtistIds);
 	}

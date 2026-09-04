@@ -22,6 +22,8 @@ public sealed class MutableAlbum : MutableDataModelBase<MutableAlbum, AlbumUpdat
 
 		return new()
 		{
+			AddedOn = Update.Value(oldState.AddedOn, AddedOn),
+			ModifiedOn = Update.Value(oldState.ModifiedOn, ModifiedOn),
 			Name = Update.Value(oldState.Name, Name),
 			ArtistIds = Update.List(oldState.ArtistIds, ArtistIds),
 		};

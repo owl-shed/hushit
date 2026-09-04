@@ -7,6 +7,19 @@ internal abstract class JsonDataRepositoryBase<TModel, TMutable, TUpdate, TTyped
 	where TTypedModel : class, TModel
 	where TJson : notnull
 {
+	#region Nested types
+	internal abstract class DataModelJson
+	{
+		#region Properties
+		[JsonPropertyName("added_on")]
+		public required DateTimeOffset AddedOn { get; set; }
+
+		[JsonPropertyName("modified_on")]
+		public required DateTimeOffset ModifiedOn { get; set; }
+		#endregion
+	}
+	#endregion
+
 	#region Constants
 	protected const string DataFileName = "data.json";
 	protected const string IndexDirectoryName = "indices";

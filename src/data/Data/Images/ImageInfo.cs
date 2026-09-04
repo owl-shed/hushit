@@ -19,15 +19,8 @@ internal sealed class ImageInfo : DataModelBase<IImageInfo, MutableImage, ImageU
 	#endregion
 
 	#region Constructors
-	public ImageInfo(IHushitData data, string id, string path, HashInfo hash) : base(data, id)
+	public ImageInfo(IHushitData data, string id, MutableImage initialState) : base(data, id, initialState)
 	{
-		Path = path;
-		Hash = hash;
-	}
-	public ImageInfo(IHushitData data, string id, MutableImage initialState) : base(data, id)
-	{
-		CopyState(initialState);
-
 		Debug.Assert(Path is not null);
 	}
 	#endregion
@@ -38,6 +31,8 @@ internal sealed class ImageInfo : DataModelBase<IImageInfo, MutableImage, ImageU
 	{
 		return new()
 		{
+			AddedOn = AddedOn,
+			ModifiedOn = ModifiedOn,
 			Path = Path,
 			Hash = Hash,
 		};
@@ -54,6 +49,8 @@ internal sealed class ImageInfo : DataModelBase<IImageInfo, MutableImage, ImageU
 		if (state.Hash is null)
 			ThrowHelper.ThrowArgumentException(nameof(state), $"Expected the new state to have a hash.");
 
+		AddedOn = state.AddedOn;
+		ModifiedOn = state.ModifiedOn;
 		Path = state.Path;
 		Hash = state.Hash.Value;
 	}

@@ -3,7 +3,7 @@ namespace OwlShed.Hushit.Data.Artists;
 /// <summary>
 /// 	Represents an update to the <see cref="IArtistInfo"/>.
 /// </summary>
-public sealed class ArtistUpdate
+public sealed class ArtistUpdate : DataModelUpdateBase
 {
 	#region Properties
 	/// <inheritdoc cref="IArtistInfo.Name"/>

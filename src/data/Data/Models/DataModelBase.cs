@@ -24,13 +24,23 @@ internal abstract class DataModelBase<TModel, TMutable, TUpdate> : ObservableBas
 	/// <inheritdoc/>
 	/// <remarks>This value should only be updated from the data repository that owns the data model.</remarks>
 	public bool Exists { get => Read(ref field); internal set => TrySet(ref field, value); } = true;
+
+	/// <inheritdoc/>
+	public DateTimeOffset AddedOn { get => Read(ref field); protected set => TrySet(ref field, value); }
+
+	/// <inheritdoc/>
+	public DateTimeOffset ModifiedOn { get => Read(ref field); protected set => TrySet(ref field, value); }
 	#endregion
 
 	#region Constructors
-	protected DataModelBase(IHushitData data, string id)
+	protected DataModelBase(IHushitData data, string id, TMutable initialState)
 	{
 		Data = data;
 		Id = id;
+		AddedOn = initialState.AddedOn;
+		ModifiedOn = initialState.ModifiedOn;
+
+		CopyState(initialState);
 	}
 	#endregion
 

@@ -22,6 +22,8 @@ public sealed class MutableArtist : MutableDataModelBase<MutableArtist, ArtistUp
 
 		return new()
 		{
+			AddedOn = Update.Value(oldState.AddedOn, AddedOn),
+			ModifiedOn = Update.Value(oldState.ModifiedOn, ModifiedOn),
 			Name = Update.Value(oldState.Name, Name),
 			Aliases = Update.List(oldState.Aliases, Aliases),
 		};

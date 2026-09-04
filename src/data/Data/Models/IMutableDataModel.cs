@@ -5,6 +5,13 @@ namespace OwlShed.Hushit.Data.Models;
 /// </summary>
 public interface IMutableDataModel
 {
+	#region Properties
+	/// <inheritdoc cref="IDataModel.AddedOn"/>
+	DateTimeOffset AddedOn { get; set; }
+
+	/// <inheritdoc cref="IDataModel.ModifiedOn"/>
+	DateTimeOffset ModifiedOn { get; set; }
+	#endregion
 }
 
 /// <summary>
@@ -47,6 +54,14 @@ public abstract class MutableDataModelBase<TSelf, TUpdate> : IMutableDataModel<T
 	where TSelf : notnull, MutableDataModelBase<TSelf, TUpdate>, new()
 	where TUpdate : notnull
 {
+	#region Properties
+	/// <inheritdoc/>
+	public DateTimeOffset AddedOn { get; set; }
+
+	/// <inheritdoc/>
+	public DateTimeOffset ModifiedOn { get; set; }
+	#endregion
+
 	#region Methods
 	/// <inheritdoc/>
 	public abstract TUpdate GetUpdateFrom(TSelf oldState);

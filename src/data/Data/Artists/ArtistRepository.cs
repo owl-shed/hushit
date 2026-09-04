@@ -6,7 +6,7 @@ internal sealed partial class ArtistRepository : JsonDataRepositoryBase<IArtistI
 	[JsonSourceGenerationOptions(WriteIndented = true, PropertyNamingPolicy = JsonKnownNamingPolicy.SnakeCaseLower)]
 	[JsonSerializable(typeof(ArtistJson))]
 	private sealed partial class ArtistJsonContext : JsonSerializerContext { }
-	internal sealed class ArtistJson
+	internal sealed class ArtistJson : DataModelJson
 	{
 		#region Properties
 		[JsonPropertyName("name")]
@@ -193,6 +193,8 @@ internal sealed partial class ArtistRepository : JsonDataRepositoryBase<IArtistI
 
 		return new()
 		{
+			AddedOn = mutable.AddedOn,
+			ModifiedOn = mutable.ModifiedOn,
 			Name = mutable.Name,
 			Aliases = mutable.Aliases.Any() ? mutable.Aliases.ToArray() : null,
 		};
@@ -201,6 +203,8 @@ internal sealed partial class ArtistRepository : JsonDataRepositoryBase<IArtistI
 	{
 		return new()
 		{
+			AddedOn = json.AddedOn,
+			ModifiedOn = json.ModifiedOn,
 			Name = json.Name,
 			Aliases = json.Aliases ?? []
 		};

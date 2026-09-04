@@ -110,16 +110,8 @@ internal sealed class AudioFileInfo : DataModelBase<IAudioFileInfo, MutableAudio
 	#endregion
 
 	#region Constructors
-	public AudioFileInfo(IHushitData data, string id, string path, HashInfo hash, string trackName) : base(data, id)
+	public AudioFileInfo(IHushitData data, string id, MutableAudioFile initialState) : base(data, id, initialState)
 	{
-		Path = path;
-		Hash = hash;
-		TrackName = trackName;
-	}
-	public AudioFileInfo(IHushitData data, string id, MutableAudioFile initialState) : base(data, id)
-	{
-		CopyState(initialState);
-
 		Debug.Assert(Path is not null);
 		Debug.Assert(TrackName is not null);
 	}
@@ -167,6 +159,8 @@ internal sealed class AudioFileInfo : DataModelBase<IAudioFileInfo, MutableAudio
 	{
 		return new()
 		{
+			AddedOn = AddedOn,
+			ModifiedOn = ModifiedOn,
 			Path = Path,
 			Hash = Hash,
 			TrackName = TrackName,
@@ -203,6 +197,8 @@ internal sealed class AudioFileInfo : DataModelBase<IAudioFileInfo, MutableAudio
 		if (state.TrackName is null)
 			ThrowHelper.ThrowArgumentException(nameof(state), $"Expected the new state to have a track name.");
 
+		AddedOn = state.AddedOn;
+		ModifiedOn = state.ModifiedOn;
 		Path = state.Path;
 		Hash = state.Hash.Value;
 		TrackName = state.TrackName;

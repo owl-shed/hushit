@@ -19,6 +19,8 @@ public sealed class MutableGenre : MutableDataModelBase<MutableGenre, GenreUpdat
 
 		return new()
 		{
+			AddedOn = Update.Value(oldState.AddedOn, AddedOn),
+			ModifiedOn = Update.Value(oldState.ModifiedOn, ModifiedOn),
 			Name = Update.Value(oldState.Name, Name),
 		};
 	}

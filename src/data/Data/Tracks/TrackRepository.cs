@@ -6,7 +6,7 @@ internal sealed partial class TrackRepository : JsonDataRepositoryBase<ITrackInf
 	[JsonSourceGenerationOptions(WriteIndented = true, PropertyNamingPolicy = JsonKnownNamingPolicy.SnakeCaseLower)]
 	[JsonSerializable(typeof(TrackJson))]
 	private sealed partial class TrackJsonContext : JsonSerializerContext { }
-	internal sealed class TrackJson
+	internal sealed class TrackJson : DataModelJson
 	{
 		#region Properties
 		[JsonPropertyName("name")]
@@ -111,6 +111,8 @@ internal sealed partial class TrackRepository : JsonDataRepositoryBase<ITrackInf
 
 		return new()
 		{
+			AddedOn = mutable.AddedOn,
+			ModifiedOn = mutable.ModifiedOn,
 			Name = mutable.Name,
 			Duration = mutable.Duration.TotalSeconds,
 			AlbumId = mutable.AlbumId,
@@ -122,6 +124,8 @@ internal sealed partial class TrackRepository : JsonDataRepositoryBase<ITrackInf
 	{
 		return new()
 		{
+			AddedOn = json.AddedOn,
+			ModifiedOn = json.ModifiedOn,
 			Name = json.Name,
 			Duration = TimeSpan.FromSeconds(json.Duration),
 			AlbumId = json.AlbumId,
