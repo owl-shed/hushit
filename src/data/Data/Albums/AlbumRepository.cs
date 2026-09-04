@@ -158,6 +158,8 @@ internal sealed partial class AlbumRepository : JsonDataRepositoryBase<IAlbumInf
 			album = await TryGetAsync(albumKeyId, cancellation).ConfigureAwait(false);
 			if (album is not null)
 				return album;
+
+			await AlbumKeyIndex.RemoveAsync(albumKeyId, cancellation).ConfigureAwait(false);
 		}
 
 		album = await CreateAsync(id, async (mutable, cancellation) =>
@@ -171,6 +173,13 @@ internal sealed partial class AlbumRepository : JsonDataRepositoryBase<IAlbumInf
 	protected override async ValueTask OnCreatedAsync(AlbumInfo model, CancellationToken cancellation = default)
 	{
 		await base.OnCreatedAsync(model, cancellation).ConfigureAwait(false);
+
+		AlbumKey key = new(model.Name, model.ArtistIds);
+		await AlbumKeyIndex.SetAsync(model.Id, key, cancellation).ConfigureAwait(false);
+	}
+	protected override async ValueTask OnUpdateAsync(AlbumInfo model, MutableAlbum oldState, MutableAlbum newState, AlbumUpdate update, CancellationToken cancellation = default)
+	{
+		await base.OnUpdateAsync(model, oldState, newState, update, cancellation).ConfigureAwait(false);
 
 		AlbumKey key = new(model.Name, model.ArtistIds);
 		await AlbumKeyIndex.SetAsync(model.Id, key, cancellation).ConfigureAwait(false);

@@ -81,7 +81,7 @@ internal sealed partial class ImageRepository : JsonDataRepositoryBase<IImageInf
 	#endregion
 
 	#region Persist methods
-	public async ValueTask<IImageInfo> CreateAsync(string path, CancellationToken cancellation = default)
+	public async ValueTask<IImageInfo> GetOrCreateAsync(string path, CancellationToken cancellation = default)
 	{
 		HashInfo hash = await GetHashAsync(path, PreferredHash, cancellation).ConfigureAwait(false);
 		string hashStr = hash.ToString();
@@ -97,6 +97,8 @@ internal sealed partial class ImageRepository : JsonDataRepositoryBase<IImageInf
 			image = await TryGetAsync(hashId, cancellation).ConfigureAwait(false);
 			if (image is not null)
 				return image;
+
+			await HashIndex.RemoveAsync(hashId, cancellation).ConfigureAwait(false);
 		}
 
 		image = await CreateAsync(id, async (mutable, cancellation) =>
@@ -117,6 +119,11 @@ internal sealed partial class ImageRepository : JsonDataRepositoryBase<IImageInf
 	protected override async ValueTask OnCreatedAsync(ImageInfo model, CancellationToken cancellation = default)
 	{
 		await base.OnCreatedAsync(model, cancellation).ConfigureAwait(false);
+		await HashIndex.SetAsync(model.Id, model.Hash.ToString(), cancellation).ConfigureAwait(false);
+	}
+	protected override async ValueTask OnUpdateAsync(ImageInfo model, MutableImage oldState, MutableImage newState, ImageUpdate update, CancellationToken cancellation = default)
+	{
+		await base.OnUpdateAsync(model, oldState, newState, update, cancellation).ConfigureAwait(false);
 		await HashIndex.SetAsync(model.Id, model.Hash.ToString(), cancellation).ConfigureAwait(false);
 	}
 	protected override async ValueTask<ImageInfo?> TryLoadPersistedAsync(string id, string directory, CancellationToken cancellation = default)

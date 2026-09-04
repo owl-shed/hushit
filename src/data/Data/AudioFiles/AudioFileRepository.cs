@@ -112,6 +112,8 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 				await ReloadAsync(file, force, cancellation).ConfigureAwait(false);
 				return file;
 			}
+
+			await PathIndex.RemoveAsync(pathId, cancellation).ConfigureAwait(false);
 		}
 
 		file = await CreateAsync(id, async (mutable, cancellation) =>
@@ -131,6 +133,11 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 	protected override async ValueTask OnCreatedAsync(AudioFileInfo model, CancellationToken cancellation = default)
 	{
 		await base.OnCreatedAsync(model, cancellation).ConfigureAwait(false);
+		await PathIndex.SetAsync(model.Id, model.Path, cancellation).ConfigureAwait(false);
+	}
+	protected override async ValueTask OnUpdateAsync(AudioFileInfo model, MutableAudioFile oldState, MutableAudioFile newState, AudioFileUpdate update, CancellationToken cancellation = default)
+	{
+		await base.OnUpdateAsync(model, oldState, newState, update, cancellation).ConfigureAwait(false);
 		await PathIndex.SetAsync(model.Id, model.Path, cancellation).ConfigureAwait(false);
 	}
 	public async ValueTask<bool> TryReloadAsync(IAudioFileInfo file, CancellationToken cancellation = default)
@@ -313,7 +320,7 @@ internal sealed partial class AudioFileRepository : JsonDataRepositoryBase<IAudi
 		if (imagePath is null)
 			return null;
 
-		IImageInfo? image = await Data.Images.CreateAsync(imagePath, cancellation).ConfigureAwait(false);
+		IImageInfo? image = await Data.Images.GetOrCreateAsync(imagePath, cancellation).ConfigureAwait(false);
 		File.Delete(imagePath);
 
 		string? directory = Path.GetDirectoryName(imagePath);

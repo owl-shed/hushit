@@ -15,11 +15,11 @@ public interface IImageRepository : IDataRepository<IImageInfo, MutableImage, Im
 	/// </remarks>
 	new ValueTask<IImageInfo> CreateAsync(Action<MutableImage> callback, CancellationToken cancellation = default);
 
-	/// <summary>Creates a new data model.</summary>
+	/// <summary>Gets or creates an image based on the image at the given <paramref name="path"/>.</summary>
 	/// <param name="path">The path of the image file.</param>
 	/// <param name="cancellation">A cancellation token that can be used to cancel the operation.</param>
-	/// <returns>The created data model.</returns>
+	/// <returns>The found or created image.</returns>
 	/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
 	/// <exception cref="FileNotFoundException">Thrown if no file exists at the given <paramref name="path"/>.</exception>
-	ValueTask<IImageInfo> CreateAsync(string path, CancellationToken cancellation = default);
+	ValueTask<IImageInfo> GetOrCreateAsync(string path, CancellationToken cancellation = default);
 }

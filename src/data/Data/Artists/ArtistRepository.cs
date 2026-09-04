@@ -138,6 +138,8 @@ internal sealed partial class ArtistRepository : JsonDataRepositoryBase<IArtistI
 			artist = await TryGetAsync(nameId, cancellation).ConfigureAwait(false);
 			if (artist is not null)
 				return artist;
+
+			await NameIndex.RemoveAsync(nameId, cancellation).ConfigureAwait(false);
 		}
 
 		artist = await CreateAsync(id, async (mutable, cancellation) =>
@@ -150,6 +152,11 @@ internal sealed partial class ArtistRepository : JsonDataRepositoryBase<IArtistI
 	protected override async ValueTask OnCreatedAsync(ArtistInfo model, CancellationToken cancellation = default)
 	{
 		await base.OnCreatedAsync(model, cancellation).ConfigureAwait(false);
+		await NameIndex.SetAsync(model.Id, model.Name, cancellation).ConfigureAwait(false);
+	}
+	protected override async ValueTask OnUpdateAsync(ArtistInfo model, MutableArtist oldState, MutableArtist newState, ArtistUpdate update, CancellationToken cancellation = default)
+	{
+		await base.OnUpdateAsync(model, oldState, newState, update, cancellation);
 		await NameIndex.SetAsync(model.Id, model.Name, cancellation).ConfigureAwait(false);
 	}
 	protected override async ValueTask<ArtistInfo?> TryLoadPersistedAsync(string id, string directory, CancellationToken cancellation = default)
