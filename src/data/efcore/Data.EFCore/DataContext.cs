@@ -44,6 +44,9 @@ public sealed class DataContext : DbContext
 
 	/// <summary>The image kinds available in the database.</summary>
 	public DbSet<ImageKind> ImageKinds { get; private set; } = null!;
+
+	/// <summary>The image kinds available in the database.</summary>
+	public DbSet<ImageResolution> ImageResolutions { get; private set; } = null!;
 	#endregion
 
 	#region Constructors

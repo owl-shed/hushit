@@ -11,7 +11,7 @@ public sealed class ImageKindConfiguration : IEntityTypeConfiguration<ImageKind>
 	{
 		builder
 			.HasIndex(nameof(ImageKind.UnknownKindDescription))
-			.HasDatabaseName("image_kind_unknown_kind_description_unique_name")
+			.HasDatabaseName("ix_image_kind_unknown_kind_description_unique_name")
 			.IsUnique();
 
 		builder.HasData([

@@ -119,7 +119,7 @@ namespace OwlShed.Hushit.Data.EFCore.Migrations
 
                     b.HasIndex("UnknownKindDescription")
                         .IsUnique()
-                        .HasDatabaseName("image_kind_unknown_kind_description_unique_name");
+                        .HasDatabaseName("ix_image_kind_unknown_kind_description_unique_name");
 
                     b.ToTable("image_kinds", (string)null);
 
@@ -132,6 +132,40 @@ namespace OwlShed.Hushit.Data.EFCore.Migrations
                         {
                             Id = "back_cover"
                         });
+                });
+
+            modelBuilder.Entity("OwlShed.Hushit.Data.EFCore.Images.Resolutions.ImageResolution", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id")
+                        .HasColumnOrder(0);
+
+                    b.Property<int>("Height")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("height")
+                        .HasColumnOrder(2);
+
+                    b.Property<string>("ImageId")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("image_id")
+                        .HasColumnOrder(1);
+
+                    b.Property<int>("Width")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("width")
+                        .HasColumnOrder(2);
+
+                    b.HasKey("Id")
+                        .HasName("pk_image_resolution");
+
+                    b.HasIndex("ImageId", "Width", "Height")
+                        .IsUnique()
+                        .HasDatabaseName("ix_image_resolution_unique_resolution");
+
+                    b.ToTable("image_resolution", (string)null);
                 });
 
             modelBuilder.Entity("OwlShed.Hushit.Data.EFCore.Universes.Universe", b =>
