@@ -249,7 +249,7 @@ namespace OwlShed.Hushit.Data.EFCore.Migrations
                     b.HasOne("OwlShed.Hushit.Data.EFCore.Images.Kinds.ImageKind", null)
                         .WithMany()
                         .HasForeignKey("KindId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired()
                         .HasConstraintName("fk_images_image_kinds_kind_id");
                 });
@@ -269,6 +269,7 @@ namespace OwlShed.Hushit.Data.EFCore.Migrations
                     b.HasOne("OwlShed.Hushit.Data.EFCore.Universes.Universe", null)
                         .WithMany()
                         .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .HasConstraintName("fk_universes_universes_parent_id");
                 });
 

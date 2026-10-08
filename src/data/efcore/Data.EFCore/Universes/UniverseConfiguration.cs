@@ -13,7 +13,8 @@ public sealed class UniverseConfiguration : IEntityTypeConfiguration<Universe>
 			.HasMany<Universe>()
 			.WithOne()
 			.HasForeignKey(e => e.ParentId)
-			.IsRequired(false);
+			.IsRequired(false)
+			.OnDelete(DeleteBehavior.Cascade);
 
 		builder
 			.HasIndex(nameof(Universe.Name))

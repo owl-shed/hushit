@@ -13,13 +13,15 @@ public sealed class ImageConfiguration : IEntityTypeConfiguration<Image>
 			.HasMany(e => e.Resolutions)
 			.WithOne()
 			.HasForeignKey(nameof(ImageResolution.ImageId))
-			.IsRequired();
+			.IsRequired()
+			.OnDelete(DeleteBehavior.Cascade);
 
 		builder
 			.HasOne<ImageKind>()
 			.WithMany()
 			.HasForeignKey(e => e.KindId)
-			.IsRequired();
+			.IsRequired()
+			.OnDelete(DeleteBehavior.NoAction);
 	}
 	#endregion
 }
