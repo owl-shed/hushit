@@ -64,6 +64,25 @@ namespace OwlShed.Hushit.Data.EFCore.Migrations
                         });
                 });
 
+            modelBuilder.Entity("OwlShed.Hushit.Data.EFCore.Hashes.HashKind", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("id")
+                        .HasColumnOrder(0);
+
+                    b.HasKey("Id")
+                        .HasName("pk_hash_kinds");
+
+                    b.ToTable("hash_kinds", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "sha256"
+                        });
+                });
+
             modelBuilder.Entity("OwlShed.Hushit.Data.EFCore.Universes.Universe", b =>
                 {
                     b.Property<string>("Id")

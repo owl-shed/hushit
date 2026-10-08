@@ -35,6 +35,9 @@ public sealed class DataContext : DbContext
 
 	/// <summary>The universes available in the database.</summary>
 	public DbSet<Universe> Universes { get; private set; } = null!;
+
+	/// <summary>The hash kinds available in the database.</summary>
+	public DbSet<HashKind> HashKinds { get; private set; } = null!;
 	#endregion
 
 	#region Constructors
