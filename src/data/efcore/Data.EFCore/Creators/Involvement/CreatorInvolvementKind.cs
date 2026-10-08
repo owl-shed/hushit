@@ -33,7 +33,7 @@ public sealed class CreatorInvolvementKind
 	#endregion
 
 	#region Constructors
-	/// <summary>Creates a new custom <see cref="CreatorInvolvementKind"/>.</summary>
+	/// <summary>Creates a new <see cref="CreatorInvolvementKind"/>.</summary>
 	/// <param name="id">The id of the involvement kind.</param>
 	/// <param name="name">The name of the involvement kind.</param>
 	/// <param name="isCustom">Whether the involvement kind was created by the user.</param>

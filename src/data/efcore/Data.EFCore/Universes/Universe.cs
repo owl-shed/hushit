@@ -32,11 +32,11 @@ public sealed class Universe
 	#endregion
 
 	#region Constructors
-	/// <summary>Creates a new custom <see cref="Universe"/>.</summary>
+	/// <summary>Creates a new <see cref="Universe"/>.</summary>
 	/// <param name="id">The id of the universe.</param>
 	/// <param name="parentId">The id of the parent universe.</param>
 	/// <param name="name">The name of the universe.</param>
-	/// <param name="isCustom">Whether the involvement kind was created by the user.</param>
+	/// <param name="isCustom">Whether the universe was created by the user.</param>
 	/// <remarks>
 	/// If <paramref name="isCustom"/> is <see langword="true"/> then the <paramref name="id"/>
 	/// should be <see cref="Guid.CreateVersion7()"/> formatted with <c>"N"</c>.
