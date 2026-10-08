@@ -1,0 +1,11 @@
+global using System.IO;
+
+global using CommunityToolkit.Diagnostics;
+
+global using OwlShed.Hushit.Data.EFCore.Creators.Involvement;
+global using OwlShed.Hushit.Data.EFCore.Fingerprints.Audio;
+global using OwlShed.Hushit.Data.EFCore.Hashes;
+global using OwlShed.Hushit.Data.EFCore.Images;
+global using OwlShed.Hushit.Data.EFCore.Images.Kinds;
+global using OwlShed.Hushit.Data.EFCore.Images.Resolutions;
+global using OwlShed.Hushit.Data.EFCore.Universes;
