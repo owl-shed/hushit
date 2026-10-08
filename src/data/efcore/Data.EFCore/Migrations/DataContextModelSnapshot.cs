@@ -102,6 +102,38 @@ namespace OwlShed.Hushit.Data.EFCore.Migrations
                         });
                 });
 
+            modelBuilder.Entity("OwlShed.Hushit.Data.EFCore.Images.Image", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("id")
+                        .HasColumnOrder(0);
+
+                    b.Property<int>("Height")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("height")
+                        .HasColumnOrder(3);
+
+                    b.Property<string>("KindId")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("kind_id")
+                        .HasColumnOrder(1);
+
+                    b.Property<int>("Width")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("width")
+                        .HasColumnOrder(2);
+
+                    b.HasKey("Id")
+                        .HasName("pk_images");
+
+                    b.HasIndex("KindId")
+                        .HasDatabaseName("ix_images_kind_id");
+
+                    b.ToTable("images", (string)null);
+                });
+
             modelBuilder.Entity("OwlShed.Hushit.Data.EFCore.Images.Kinds.ImageKind", b =>
                 {
                     b.Property<string>("Id")
@@ -212,12 +244,37 @@ namespace OwlShed.Hushit.Data.EFCore.Migrations
                         });
                 });
 
+            modelBuilder.Entity("OwlShed.Hushit.Data.EFCore.Images.Image", b =>
+                {
+                    b.HasOne("OwlShed.Hushit.Data.EFCore.Images.Kinds.ImageKind", null)
+                        .WithMany()
+                        .HasForeignKey("KindId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_images_image_kinds_kind_id");
+                });
+
+            modelBuilder.Entity("OwlShed.Hushit.Data.EFCore.Images.Resolutions.ImageResolution", b =>
+                {
+                    b.HasOne("OwlShed.Hushit.Data.EFCore.Images.Image", null)
+                        .WithMany("Resolutions")
+                        .HasForeignKey("ImageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_image_resolution_images_image_id");
+                });
+
             modelBuilder.Entity("OwlShed.Hushit.Data.EFCore.Universes.Universe", b =>
                 {
                     b.HasOne("OwlShed.Hushit.Data.EFCore.Universes.Universe", null)
                         .WithMany()
                         .HasForeignKey("ParentId")
                         .HasConstraintName("fk_universes_universes_parent_id");
+                });
+
+            modelBuilder.Entity("OwlShed.Hushit.Data.EFCore.Images.Image", b =>
+                {
+                    b.Navigation("Resolutions");
                 });
 #pragma warning restore 612, 618
         }
