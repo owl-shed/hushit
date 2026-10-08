@@ -29,6 +29,11 @@ public sealed class DataContext : DbContext
 	}
 	#endregion
 
+	#region Properties
+	/// <summary>The creator involvement kinds available in the database.</summary>
+	public DbSet<CreatorInvolvementKind> CreatorInvolvementKinds { get; private set; } = null!;
+	#endregion
+
 	#region Constructors
 	/// <summary>Creates a new <see cref="DataContext"/>.</summary>
 	/// <param name="options">The options used to customise the database context.</param>

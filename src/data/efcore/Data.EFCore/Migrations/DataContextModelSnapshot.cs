@@ -15,6 +15,54 @@ namespace OwlShed.Hushit.Data.EFCore.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.12");
+
+            modelBuilder.Entity("OwlShed.Hushit.Data.EFCore.Creators.Involvement.CreatorInvolvementKind", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("id")
+                        .HasColumnOrder(0);
+
+                    b.Property<bool>("IsCustom")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("is_custom")
+                        .HasColumnOrder(1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("name")
+                        .HasColumnOrder(2);
+
+                    b.HasKey("Id")
+                        .HasName("pk_creator_involvement_kinds");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_creator_involvement_kind_unique_name");
+
+                    b.ToTable("creator_involvement_kinds", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "artist",
+                            IsCustom = false,
+                            Name = "Artist"
+                        },
+                        new
+                        {
+                            Id = "composer",
+                            IsCustom = false,
+                            Name = "Composer"
+                        },
+                        new
+                        {
+                            Id = "lyricist",
+                            IsCustom = false,
+                            Name = "Lyricist"
+                        });
+                });
 #pragma warning restore 612, 618
         }
     }
