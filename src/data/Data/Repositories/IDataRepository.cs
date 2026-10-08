@@ -1,4 +1,4 @@
-namespace OwlShed.Hushit.Data;
+namespace OwlShed.Hushit.Data.Repositories;
 
 /// <summary>
 /// 	Represents a data model repository.
@@ -6,6 +6,9 @@ namespace OwlShed.Hushit.Data;
 public interface IDataRepository
 {
 	#region Methods
+	/// <summary>Called by the <see cref="IHushitData"/> once all of the repositories have been created.</summary>
+	void Initialise();
+
 	/// <summary>Gets all of the data models stored in the repository.</summary>
 	/// <param name="cancellation">A cancellation token that can be used to cancel the operation.</param>
 	/// <returns>An asynchronous enumerable for all of the stored data models.</returns>
@@ -38,6 +41,14 @@ public interface IDataRepository
 public interface IDataRepository<TModel> : IDataRepository
 	where TModel : notnull, IDataModel
 {
+	#region Events
+	/// <summary>An event that is raised when a new model is added.</summary>
+	IAsyncEvent<TModel> ModelAdded { get; }
+
+	/// <summary>An event that is raised when a new model is removed.</summary>
+	IAsyncEvent<TModel> ModelRemoved { get; }
+	#endregion
+
 	#region Methods
 	/// <summary>Gets all of the data models stored in the repository.</summary>
 	/// <param name="cancellation">A cancellation token that can be used to cancel the operation.</param>
@@ -75,10 +86,10 @@ public interface IDataRepository<TModel> : IDataRepository
 /// 	Represents a data model repository.
 /// </summary>
 /// <typeparam name="TModel">The type of the models that the repository manages.</typeparam>
-/// <typeparam name="TUpdate">The type that represents the model update builder.</typeparam>
-public interface IDataRepository<TModel, TUpdate> : IDataRepository<TModel>
-	where TModel : notnull, IDataModel<TUpdate>
-	where TUpdate : notnull
+/// <typeparam name="TMutable">The type that represents the mutable <typeparamref name="TModel"/>.</typeparam>
+public interface IDataRepository<TModel, TMutable> : IDataRepository<TModel>
+	where TModel : notnull, IDataModel
+	where TMutable : notnull, IMutableDataModel
 {
 	#region Methods
 	/// <summary>Creates a new data model.</summary>
@@ -87,16 +98,111 @@ public interface IDataRepository<TModel, TUpdate> : IDataRepository<TModel>
 	/// <returns>The created data model.</returns>
 	/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
 	/// <exception cref="InvalidOperationException">Thrown if the <paramref name="callback"/> didn't provide the required information.</exception>
-	ValueTask<TModel> CreateAsync(Action<TUpdate> callback, CancellationToken cancellation = default);
+	ValueTask<TModel> CreateAsync(Action<TMutable> callback, CancellationToken cancellation = default);
 
-	/// <summary>Updates the given <paramref name="model"/>.</summary>
-	/// <param name="model">The data model to update.</param>
+	/// <summary>Creates a new data model.</summary>
+	/// <param name="callback">A callback that can be used to set the initial information about the data model.</param>
+	/// <param name="cancellation">A cancellation token that can be used to cancel the operation.</param>
+	/// <returns>The created data model.</returns>
+	/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
+	/// <exception cref="InvalidOperationException">Thrown if the <paramref name="callback"/> didn't provide the required information.</exception>
+	ValueTask<TModel> CreateAsync(Func<TMutable, CancellationToken, ValueTask> callback, CancellationToken cancellation = default);
+
+	/// <summary>Updates the given <paramref name="id"/>.</summary>
+	/// <param name="id">The id of the data model to update.</param>
 	/// <param name="callback">A callback that can be used to update the data model.</param>
 	/// <param name="cancellation">A cancellation token that can be used to cancel the operation.</param>
-	/// <returns><see langword="true"/> if any changes were made to the data <paramref name="model"/>, <see langword="false"/> otherwise.</returns>
+	/// <returns><see langword="true"/> if any changes were made to the data <paramref name="id"/>, <see langword="false"/> otherwise.</returns>
 	/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
-	/// <exception cref="ArgumentException">Thrown if the data <paramref name="model"/> no longer existed in the repository.</exception>
-	ValueTask<bool> UpdateAsync(TModel model, Action<TUpdate> callback, CancellationToken cancellation = default);
+	/// <exception cref="ArgumentException">Thrown if the data model with the given <paramref name="id"/> no longer existed in the repository.</exception>
+	ValueTask<bool> UpdateAsync(string id, Action<TMutable> callback, CancellationToken cancellation = default);
+
+	/// <summary>Updates the given <paramref name="id"/>.</summary>
+	/// <param name="id">The id of the data model to update.</param>
+	/// <param name="callback">A callback that can be used to update the data model.</param>
+	/// <param name="cancellation">A cancellation token that can be used to cancel the operation.</param>
+	/// <returns><see langword="true"/> if any changes were made to the data <paramref name="id"/>, <see langword="false"/> otherwise.</returns>
+	/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
+	/// <exception cref="ArgumentException">Thrown if the data model with the given <paramref name="id"/> no longer existed in the repository.</exception>
+	ValueTask<bool> UpdateAsync(string id, Func<TMutable, CancellationToken, ValueTask> callback, CancellationToken cancellation = default);
+	#endregion
+}
+
+/// <summary>
+/// 	Represents the kind of the model update.
+/// </summary>
+public enum ModelUpdateKind
+{
+	/// <summary>The model was added.</summary>
+	Added,
+
+	/// <summary>The model was removed.</summary>
+	Removed,
+
+	/// <summary>The model was changed.</summary>
+	Changed,
+}
+
+/// <summary>
+/// 	Represents the arguments for a model update event.
+/// </summary>
+/// <typeparam name="TModel">The type of the model that was updated.</typeparam>
+/// <typeparam name="TMutable">The type for the mutable version of the <typeparamref name="TModel"/>.</typeparam>
+/// <typeparam name="TUpdate">The type that represents the update between two <typeparamref name="TMutable"/> instances.</typeparam>
+public readonly struct ModelUpdateInfo<TModel, TMutable, TUpdate>
+	where TModel : notnull, IDataModel<TMutable, TUpdate>
+	where TMutable : notnull, IMutableDataModel<TMutable, TUpdate>
+	where TUpdate : notnull
+{
+	#region Properties
+	/// <summary>The kind of the update.</summary>
+	public ModelUpdateKind Kind { get; }
+
+	/// <summary>The model that was updated.</summary>
+	public TModel Model { get; }
+
+	/// <summary>The old state of the model.</summary>
+	public TMutable Old { get; }
+
+	/// <summary>The new state of the model.</summary>
+	public TMutable New { get; }
+
+	/// <summary>The update from the old state, to the new state of the model.</summary>
+	public TUpdate Update { get; }
+	#endregion
+
+	#region Constructors
+	/// <summary>Creates a new instance of the <see cref="ModelUpdateInfo{TModel, TMutable, TUpdate}"/>.</summary>
+	/// <param name="kind">The kind of the update.</param>
+	/// <param name="model">The model that was updated.</param>
+	/// <param name="oldState">The old state of the model.</param>
+	/// <param name="newState">The new state of the model.</param>
+	/// <param name="update">The update from the old state, to the new state of the model.</param>
+	public ModelUpdateInfo(ModelUpdateKind kind, TModel model, TMutable oldState, TMutable newState, TUpdate update)
+	{
+		Kind = kind;
+		Model = model;
+		Old = oldState;
+		New = newState;
+		Update = update;
+	}
+	#endregion
+}
+
+/// <summary>
+/// 	Represents a data model repository.
+/// </summary>
+/// <typeparam name="TModel">The type of the models that the repository manages.</typeparam>
+/// <typeparam name="TMutable">The type that represents the mutable <typeparamref name="TModel"/>.</typeparam>
+/// <typeparam name="TUpdate">The type that represents an update between two <typeparamref name="TMutable"/> instances.</typeparam>
+public interface IDataRepository<TModel, TMutable, TUpdate> : IDataRepository<TModel, TMutable>
+	where TModel : notnull, IDataModel<TMutable, TUpdate>
+	where TMutable : notnull, IMutableDataModel<TMutable, TUpdate>
+	where TUpdate : notnull
+{
+	#region Events
+	/// <summary>An event that is raised when an existing model is updated.</summary>
+	IAsyncEvent<ModelUpdateInfo<TModel, TMutable, TUpdate>> ModelUpdated { get; }
 	#endregion
 }
 
@@ -156,33 +262,40 @@ public static class IDataRepositoryExtensions
 		public async ValueTask<bool> RemoveAsync(TModel model, CancellationToken cancellation = default)
 		{
 			cancellation.ThrowIfCancellationRequested();
-
 			return await repository.RemoveAsync(model.Id, cancellation).ConfigureAwait(false);
 		}
 		#endregion
 	}
 
-	extension<TModel, TUpdate>(IDataRepository<TModel, TUpdate> repository)
-		where TModel : notnull, IDataModel<TUpdate>
-		where TUpdate : notnull
+	extension<TModel, TMutable>(IDataRepository<TModel, TMutable> repository)
+		where TModel : notnull, IDataModel<TMutable>
+		where TMutable : notnull, IMutableDataModel<TMutable>
 	{
 		#region Methods
-		/// <summary>Updates the data model with the given <paramref name="id"/>..</summary>
-		/// <param name="id">The id of the data model to update.</param>
+		/// <summary>Updates the data model with the given <paramref name="model"/>..</summary>
+		/// <param name="model">The data model to update.</param>
 		/// <param name="callback">A callback that can be used to update the data model.</param>
 		/// <param name="cancellation">A cancellation token that can be used to cancel the operation.</param>
 		/// <returns><see langword="true"/> if any changes were made to the data model, <see langword="false"/> otherwise.</returns>
 		/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
 		/// <exception cref="ArgumentException">Thrown if the data model no longer existed in the repository.</exception>
-		public async ValueTask<bool> UpdateAsync(string id, Action<TUpdate> callback, CancellationToken cancellation = default)
+		public async ValueTask<bool> UpdateAsync(TModel model, Action<TMutable> callback, CancellationToken cancellation = default)
 		{
 			cancellation.ThrowIfCancellationRequested();
+			return await repository.UpdateAsync(model.Id, callback, cancellation).ConfigureAwait(false);
+		}
 
-			TModel? model = await repository.TryGetAsync(id, cancellation).ConfigureAwait(false);
-			if (model is null)
-				ThrowHelper.ThrowArgumentException(nameof(id), $"No data model with the given id ({id}) existed in the repository.");
-
-			return await repository.UpdateAsync(model, callback, cancellation).ConfigureAwait(false);
+		/// <summary>Updates the data model with the given <paramref name="model"/>..</summary>
+		/// <param name="model">The data model to update.</param>
+		/// <param name="callback">A callback that can be used to update the data model.</param>
+		/// <param name="cancellation">A cancellation token that can be used to cancel the operation.</param>
+		/// <returns><see langword="true"/> if any changes were made to the data model, <see langword="false"/> otherwise.</returns>
+		/// <exception cref="OperationCanceledException">Thrown when the operation is cancelled.</exception>
+		/// <exception cref="ArgumentException">Thrown if the data model no longer existed in the repository.</exception>
+		public async ValueTask<bool> UpdateAsync(TModel model, Func<TMutable, CancellationToken, ValueTask> callback, CancellationToken cancellation = default)
+		{
+			cancellation.ThrowIfCancellationRequested();
+			return await repository.UpdateAsync(model.Id, callback, cancellation).ConfigureAwait(false);
 		}
 		#endregion
 	}
