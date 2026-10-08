@@ -11,6 +11,9 @@
 	<Folder Name="/data/">
 		<Project Path="data/Data/Data.csproj" />
 	</Folder>
+	<Folder Name="/data/efcore/">
+		<Project Path="data/efcore/Data.EFCore/Data.EFCore.csproj" />
+	</Folder>
 	<Folder Name="/engine/">
 		<Project Path="engine/Engine/Engine.csproj" />
 	</Folder>
