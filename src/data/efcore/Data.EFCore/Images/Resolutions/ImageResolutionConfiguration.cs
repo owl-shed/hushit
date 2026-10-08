@@ -9,10 +9,7 @@ public sealed class ImageResolutionConfiguration : IEntityTypeConfiguration<Imag
 	/// <inheritdoc/>
 	public void Configure(EntityTypeBuilder<ImageResolution> builder)
 	{
-		builder
-			.HasIndex(nameof(ImageResolution.ImageId), nameof(ImageResolution.Width), nameof(ImageResolution.Height))
-			.HasDatabaseName("ix_image_resolution_unique_resolution")
-			.IsUnique();
+		builder.HasKey(c => new { c.ImageId, c.Width, c.Height });
 	}
 	#endregion
 }

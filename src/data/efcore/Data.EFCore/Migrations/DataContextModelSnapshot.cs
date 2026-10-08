@@ -168,36 +168,25 @@ namespace OwlShed.Hushit.Data.EFCore.Migrations
 
             modelBuilder.Entity("OwlShed.Hushit.Data.EFCore.Images.Resolutions.ImageResolution", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasColumnName("id")
+                    b.Property<string>("ImageId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("image_id")
                         .HasColumnOrder(0);
+
+                    b.Property<int>("Width")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("width")
+                        .HasColumnOrder(1);
 
                     b.Property<int>("Height")
                         .HasColumnType("INTEGER")
                         .HasColumnName("height")
                         .HasColumnOrder(2);
 
-                    b.Property<string>("ImageId")
-                        .IsRequired()
-                        .HasColumnType("TEXT")
-                        .HasColumnName("image_id")
-                        .HasColumnOrder(1);
+                    b.HasKey("ImageId", "Width", "Height")
+                        .HasName("pk_image_resolutions");
 
-                    b.Property<int>("Width")
-                        .HasColumnType("INTEGER")
-                        .HasColumnName("width")
-                        .HasColumnOrder(2);
-
-                    b.HasKey("Id")
-                        .HasName("pk_image_resolution");
-
-                    b.HasIndex("ImageId", "Width", "Height")
-                        .IsUnique()
-                        .HasDatabaseName("ix_image_resolution_unique_resolution");
-
-                    b.ToTable("image_resolution", (string)null);
+                    b.ToTable("image_resolutions", (string)null);
                 });
 
             modelBuilder.Entity("OwlShed.Hushit.Data.EFCore.Universes.Universe", b =>
@@ -261,7 +250,7 @@ namespace OwlShed.Hushit.Data.EFCore.Migrations
                         .HasForeignKey("ImageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_image_resolution_images_image_id");
+                        .HasConstraintName("fk_image_resolutions_images_image_id");
                 });
 
             modelBuilder.Entity("OwlShed.Hushit.Data.EFCore.Universes.Universe", b =>

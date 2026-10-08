@@ -3,21 +3,17 @@ namespace OwlShed.Hushit.Data.EFCore.Images.Resolutions;
 /// <summary>
 /// Represents the database model for image resolutions.
 /// </summary>
-[Table("image_resolution")]
+[Table("image_resolutions")]
 [DebuggerDisplay($"{{{nameof(DebuggerDisplay)}(), nq}}")]
 public sealed class ImageResolution
 {
 	#region Properties
-	/// <summary>The id of the image resolution.</summary>
-	[Column(Order = 0)]
-	public int Id { get; init; }
-
 	/// <summary>The id of the image that the resolution is for.</summary>
-	[Column(Order = 1)]
+	[Column(Order = 0)]
 	public string ImageId { get; init; }
 
 	/// <summary>The width of the image resolution.</summary>
-	[Column(Order = 2)]
+	[Column(Order = 1)]
 	public int Width { get; init; }
 
 	/// <summary>The height of the image resolution.</summary>
