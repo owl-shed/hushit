@@ -32,6 +32,9 @@ public sealed class DataContext : DbContext
 	#region Properties
 	/// <summary>The creator involvement kinds available in the database.</summary>
 	public DbSet<CreatorInvolvementKind> CreatorInvolvementKinds { get; private set; } = null!;
+
+	/// <summary>The universes available in the database.</summary>
+	public DbSet<Universe> Universes { get; private set; } = null!;
 	#endregion
 
 	#region Constructors

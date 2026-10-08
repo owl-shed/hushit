@@ -63,6 +63,58 @@ namespace OwlShed.Hushit.Data.EFCore.Migrations
                             Name = "Lyricist"
                         });
                 });
+
+            modelBuilder.Entity("OwlShed.Hushit.Data.EFCore.Universes.Universe", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("id")
+                        .HasColumnOrder(0);
+
+                    b.Property<bool>("IsCustom")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("is_custom")
+                        .HasColumnOrder(1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("name")
+                        .HasColumnOrder(3);
+
+                    b.Property<string>("ParentId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("parent_id")
+                        .HasColumnOrder(2);
+
+                    b.HasKey("Id")
+                        .HasName("pk_universes");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_universe_unique_name");
+
+                    b.HasIndex("ParentId")
+                        .HasDatabaseName("ix_universes_parent_id");
+
+                    b.ToTable("universes", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "real",
+                            IsCustom = false,
+                            Name = "Real"
+                        });
+                });
+
+            modelBuilder.Entity("OwlShed.Hushit.Data.EFCore.Universes.Universe", b =>
+                {
+                    b.HasOne("OwlShed.Hushit.Data.EFCore.Universes.Universe", null)
+                        .WithMany()
+                        .HasForeignKey("ParentId")
+                        .HasConstraintName("fk_universes_universes_parent_id");
+                });
 #pragma warning restore 612, 618
         }
     }
