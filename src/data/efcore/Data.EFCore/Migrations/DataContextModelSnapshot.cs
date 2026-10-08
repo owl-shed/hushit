@@ -64,6 +64,25 @@ namespace OwlShed.Hushit.Data.EFCore.Migrations
                         });
                 });
 
+            modelBuilder.Entity("OwlShed.Hushit.Data.EFCore.Fingerprints.Audio.AudioFingerprintKind", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("id")
+                        .HasColumnOrder(0);
+
+                    b.HasKey("Id")
+                        .HasName("pk_audio_fingerprint_kinds");
+
+                    b.ToTable("audio_fingerprint_kinds", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "chromaprint"
+                        });
+                });
+
             modelBuilder.Entity("OwlShed.Hushit.Data.EFCore.Hashes.HashKind", b =>
                 {
                     b.Property<string>("Id")

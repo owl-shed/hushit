@@ -38,6 +38,9 @@ public sealed class DataContext : DbContext
 
 	/// <summary>The hash kinds available in the database.</summary>
 	public DbSet<HashKind> HashKinds { get; private set; } = null!;
+
+	/// <summary>The audio fingerprint kinds available in the database.</summary>
+	public DbSet<AudioFingerprintKind> AudioFingerprintKinds { get; private set; } = null!;
 	#endregion
 
 	#region Constructors
