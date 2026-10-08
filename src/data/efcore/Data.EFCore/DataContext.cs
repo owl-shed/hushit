@@ -41,6 +41,9 @@ public sealed class DataContext : DbContext
 
 	/// <summary>The audio fingerprint kinds available in the database.</summary>
 	public DbSet<AudioFingerprintKind> AudioFingerprintKinds { get; private set; } = null!;
+
+	/// <summary>The image kinds available in the database.</summary>
+	public DbSet<ImageKind> ImageKinds { get; private set; } = null!;
 	#endregion
 
 	#region Constructors

@@ -102,6 +102,38 @@ namespace OwlShed.Hushit.Data.EFCore.Migrations
                         });
                 });
 
+            modelBuilder.Entity("OwlShed.Hushit.Data.EFCore.Images.Kinds.ImageKind", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("id")
+                        .HasColumnOrder(0);
+
+                    b.Property<string>("UnknownKindDescription")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("unknown_kind_description")
+                        .HasColumnOrder(1);
+
+                    b.HasKey("Id")
+                        .HasName("pk_image_kinds");
+
+                    b.HasIndex("UnknownKindDescription")
+                        .IsUnique()
+                        .HasDatabaseName("image_kind_unknown_kind_description_unique_name");
+
+                    b.ToTable("image_kinds", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "front_cover"
+                        },
+                        new
+                        {
+                            Id = "back_cover"
+                        });
+                });
+
             modelBuilder.Entity("OwlShed.Hushit.Data.EFCore.Universes.Universe", b =>
                 {
                     b.Property<string>("Id")
